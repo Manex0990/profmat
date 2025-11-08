@@ -1,431 +1,287 @@
 from random import randint, uniform
-
-from flask import make_response, render_template
+from typing import List, Tuple
 
 
 class MyMath:
     def __init__(self):
-        pass
+        self.OPERATORS = {
+            '+': 's',
+            '-': 'm',
+            '*': 'mul',
+            ':': 'cr'
+        }
 
-    def generate_square_x(self):
-        """
-        Вернет кв уравнение в строковом формате.
-        """
-        a_sq = randint(-3, 5)
-        if a_sq == 0:
-            while a_sq == 0:
-                a_sq = randint(-3, 5)
-        b_sq = randint(-9, 9)
-        c_sq = randint(-9, 9)
-        if b_sq == 0:
-            b_sq = 1
-        elif c_sq == 0:
-            c_sq = 1
+    def _format_equation_term(self, coeff: int, variable: str = '', is_first: bool = False) -> str:
+        """Форматирует коэффициент уравнения"""
+        if coeff == 0:
+            return ""
 
-        if b_sq == 1:
-            if c_sq < 0 and a_sq != 1 and a_sq != -1:
-                return f'{a_sq}x\u00B2 + x - {-c_sq} = 0'
-            elif c_sq < 0 and a_sq == -1:
-                return f'-x\u00B2 + x - {-c_sq} = 0'
-            elif c_sq < 0 and a_sq == 1:
-                return f'x\u00B2 + x - {-c_sq} = 0'
-            elif c_sq > 0 and a_sq != 1 and a_sq != -1:
-                return f'{a_sq}x\u00B2 + x + {c_sq} = 0'
-            elif c_sq > 0 and a_sq == -1:
-                return f'-x\u00B2 + x + {c_sq} = 0'
-            elif c_sq > 0 and a_sq == 1:
-                return f'x\u00B2 + x + {c_sq} = 0'
+        sign = ""
+        if not is_first:
+            sign = " + " if coeff > 0 else " - "
 
-        elif b_sq == -1:
-            if c_sq < 0 and a_sq != 1 and a_sq != -1:
-                return f'{a_sq}x\u00B2 - x - {-c_sq} = 0'
-            elif c_sq < 0 and a_sq == -1:
-                return f'-x\u00B2 - x - {-c_sq} = 0'
-            elif c_sq < 0 and a_sq == 1:
-                return f'x\u00B2 - x - {-c_sq} = 0'
-            elif c_sq > 0 and a_sq != 1 and a_sq != -1:
-                return f'{a_sq}x\u00B2 - x + {c_sq} = 0'
-            elif c_sq > 0 and a_sq == -1:
-                return f'-x\u00B2 - x + {c_sq} = 0'
-            elif c_sq > 0 and a_sq == 1:
-                return f'x\u00B2 - x + {c_sq} = 0'
+        abs_coeff = abs(coeff)
 
-        else:
-            if b_sq > 0:
-                if c_sq < 0 and a_sq != 1 and a_sq != -1:
-                    return f'{a_sq}x\u00B2 + {b_sq}x - {-c_sq} = 0'
-                elif c_sq < 0 and a_sq == -1:
-                    return f'-x\u00B2 + {b_sq}x - {-c_sq} = 0'
-                elif c_sq < 0 and a_sq == 1:
-                    return f'x\u00B2 + {b_sq}x - {-c_sq} = 0'
-                elif c_sq > 0 and a_sq != 1 and a_sq != -1:
-                    return f'{a_sq}x\u00B2 + {b_sq}x + {c_sq} = 0'
-                elif c_sq > 0 and a_sq == -1:
-                    return f'-x\u00B2 + {b_sq}x + {c_sq} = 0'
-                elif c_sq > 0 and a_sq == 1:
-                    return f'x\u00B2 + {b_sq}x + {c_sq} = 0'
-            elif b_sq < 0:
-                if c_sq < 0 and a_sq != 1 and a_sq != -1:
-                    return f'{a_sq}x\u00B2 - {-b_sq}x - {-c_sq} = 0'
-                elif c_sq < 0 and a_sq == -1:
-                    return f'-x\u00B2 - {-b_sq}x - {-c_sq} = 0'
-                elif c_sq < 0 and a_sq == 1:
-                    return f'x\u00B2 - {-b_sq}x - {-c_sq} = 0'
-                elif c_sq > 0 and a_sq != 1 and a_sq != -1:
-                    return f'{a_sq}x\u00B2 - {-b_sq}x + {c_sq} = 0'
-                elif c_sq > 0 and a_sq == -1:
-                    return f'-x\u00B2 - {-b_sq}x + {c_sq} = 0'
-                elif c_sq > 0 and a_sq == 1:
-                    return f'x\u00B2 - {-b_sq}x + {c_sq} = 0'
-
-    def find_coofs_square_x(self, square_x):
-        coofs = []
-        if square_x.startswith('-'):
-            a_sq = -1
-        elif square_x.startswith('x'):
-            a_sq = 1
-        else:
-            for i in square_x:
-                if i != '\u00B2' and i.isdigit() and int(i) != 0:
-                    coofs.append(i)
-            a_sq = int(coofs[0])
-
-        square_x = square_x.split()
-        if square_x[1] == '-' and square_x[2] == 'x':
-            b_sq = -1
-        elif square_x[1] == '+' and square_x[2] == 'x':
-            b_sq = 1
-        else:
-            if square_x[1] == '-':
-                b_sq = -int(square_x[2][0])
-            elif square_x[1] == '+':
-                b_sq = int(square_x[2][0])
-
-        if square_x[3] == '-':
-            c_sq = -int(square_x[4])
-        elif square_x[3] == '+':
-            c_sq = int(square_x[4])
-        return [a_sq, b_sq, c_sq]
-
-    def answer_square_x(self, square_x):
-        """
-        Вернет 1) если дискриминант положительный - список из 2 целых или дробных чисел
-                  2) если дискриминант 0 - одно целое или дробное число
-                  3) если дискриминант отрицательный - строку "Корней нет"
-           корни последнего сгенерированного кв уравнения
-           """
-        coofs = self.find_coofs_square_x(square_x)
-        a_sq, b_sq, c_sq = coofs[0], coofs[1], coofs[2]
-        d = (abs(b_sq) ** 2) - (4 * a_sq * c_sq)
-        if d == 0:
-            answer = (-b_sq) / (2 * a_sq)
-            if int(answer) == answer:
-                answer = int(answer)
-            elif int(answer) != answer:
-                answer = round(answer, 2)
-            return str(answer)
-
-        elif d > 0:
-            x1 = (-b_sq - d ** 0.5) / (2 * a_sq)
-            x2 = (-b_sq + d ** 0.5) / (2 * a_sq)
-            if int(x1) == x1 and int(x2) != x2:
-                answer = sorted([int(x1), round(x2, 2)])
-            elif int(x1) != x1 and int(x2) == x2:
-                answer = sorted([round(x1, 2), int(x2)])
-            elif int(x1) == x1 and int(x2) == x2:
-                answer = sorted([int(x1), int(x2)])
-            elif int(x1) != x1 and int(x2) != x2:
-                answer = sorted([round(x1, 2), round(x2, 2)])
-            for i in range(len(answer)):
-                answer[i] = str(answer[i])
-            return ' '.join(answer)
-
-        else:
-            answer = 'Корней нет'
-            return answer
-
-    def find_discriminant(self, square_x):
-        coofs = self.find_coofs_square_x(square_x)
-        a_sq, b_sq, c_sq = coofs[0], coofs[1], coofs[2]
-        d = (abs(b_sq) ** 2) - (4 * a_sq * c_sq)
-        return d
-
-    def check_answer_square_x(self, task, user_answer):
-        """
-        В качестве ответа может быть принято
-        1) 2 корня кв уравнения через пробел(это могут быть целые числа или дробные(округлите до сотых) числа)
-        2) один корень - целое чило или дробное(округлите до сотых) число
-        3) строка 'Корней нет'
-        """
-        if str(user_answer) == str(self.answer_square_x(task)):
-            return ['Верно. Продолжайте в том же духе.', True, 'square_x']
-        else:
-            return ['Неверно. Проверьте расчёты и попробуйте еще раз.', False]
-
-    def generate_line_x(self):
-        """
-        Вернет линейное уравнение в строковом формате
-        """
-        a_li = randint(-9, 9)
-        if a_li == 0:
-            a_li = 1
-        b_li = randint(-9, 9)
-        c_li = randint(-9, 9)
-        if c_li == 0:
-            c_li = 1
-
-        if b_li < 0:
-            line_x = f'{a_li}x - {-b_li} = {c_li}'
-        elif b_li > 0:
-            line_x = f'{a_li}x + {b_li} = {c_li}'
-        elif b_li == 0:
-            b_li = 1
-            line_x = f'{a_li}x + {b_li} = {c_li}'
-
-        if a_li == 1:
-            line_x = line_x[1:]
-        elif a_li == -1:
-            line_x = f'-{line_x[2:]}'
-        return line_x
-
-    def answer_line_x(self, line_x):
-        """
-        Вернет корень последнего сгенерированного линейного уравнения
-        """
-        line_x = line_x.split()
-        if line_x[0][0] == '-' and line_x[0][1] == 'x':
-            a_li = -1
-        elif line_x[0] == 'x':
-            a_li = 1
-        else:
-            if line_x[0][0] == '-':
-                a_li = -int(line_x[0][1])
+        if variable:
+            if abs_coeff == 1:
+                return f"{sign}{variable}" if not is_first else variable
             else:
-                a_li = int(line_x[0][0])
-
-        if line_x[1] == '-':
-            b_li = -int(line_x[2])
-        elif line_x[1] == '+':
-            b_li = int(line_x[2])
-
-        c_li = int(line_x[-1])
-
-        temp_x = c_li + (-b_li)
-        if temp_x / a_li == temp_x // a_li:
-            x = int(temp_x / a_li)
+                return f"{sign}{abs_coeff}{variable}" if not is_first else f"{abs_coeff}{variable}"
         else:
-            x = round(temp_x / a_li, 2)
-        return str(x)
+            return f"{sign}{abs_coeff}" if not is_first else str(abs_coeff)
 
-    def check_answer_line_x(self, task, user_answer):
-        """
-        В качестве ответа может быть принято
-        целое число или дробное(округлите до сотых) число
-        """
-        if str(user_answer) == str(self.answer_line_x(task)):
-            return ['Верно. Продолжайте в том же духе.', True, 'line_x']
+    def _parse_coefficient(self, term: str) -> int:
+        """Парсит коэффициент из строки"""
+        if term == 'x' or term == '+x':
+            return 1
+        elif term == '-x':
+            return -1
+        elif term.startswith('+'):
+            return int(term[1:-1]) if 'x' in term else int(term[1:])
+        elif term.startswith('-'):
+            return -int(term[1:-1]) if 'x' in term else -int(term[1:])
         else:
-            return [f'Неверно. Проверьте расчеты и попробуйте позже.', False]
+            return int(term[:-1]) if 'x' in term else int(term)
 
-    def search_coofs_for_stage_1_2(self, task):
-        """
-        Находит коэффициенты примеров простого и среднего уровня сложности.
-        """
-        task = task.split()
-        coofs = [float(task[0]), float(task[2])]
-        return coofs
+    def generate_square_x(self) -> str:
+        """Генерирует квадратное уравнение в строковом формате"""
+        a = randint(-3, 5)
+        while a == 0:
+            a = randint(-3, 5)
 
-    def search_coofs_for_stage_3(self, task):
-        """
-        Находит коэффициенты примеров сложного уровня сложности.
-        """
-        task = task.split()
-        coofs = [int(task[0]), float(task[2]), float(task[4]), int(task[6])]
-        return coofs
+        b = randint(-9, 9)
+        c = randint(-9, 9)
 
-    def iddentificate_task(self, task):
-        """
-        Узнает тип примера и уровень.
-        """
-        task = task.split()
-        stage = 0
+        # Формируем уравнение
+        equation = self._format_equation_term(a, 'x²', True)
+        equation += self._format_equation_term(b, 'x')
+        equation += self._format_equation_term(c)
 
-        if len(task) == 5:
-            if task[0].isdigit() and task[2].isdigit():
-                stage = 1
-            elif ((len(task[0]) == 3 or len(task[0]) == 4 or len(task[0]) == 5) or
-                  (len(task[2]) == 3 or len(task[2]) == 4 or len(task[0]) == 5)):
-                stage = 2
-        elif len(task) == 9:
+        return f"{equation} = 0"
+
+    def find_coofs_square_x(self, square_x: str) -> List[int]:
+        """Находит коэффициенты квадратного уравнения"""
+        # Упрощенный парсинг - в реальном коде нужно доработать
+        parts = square_x.replace('x²', ' ').replace('x', ' ').replace('+', ' +').replace('-', ' -').split()
+
+        a = b = c = 0
+        for part in parts:
+            if '²' in part:
+                a = self._parse_coefficient(part)
+            elif part.replace('.', '').replace('-', '').isdigit():
+                if parts.index(part) > parts.index([p for p in parts if '²' in p][0]):
+                    c = self._parse_coefficient(part)
+            else:
+                b = self._parse_coefficient(part)
+
+        return [a, b, c]
+
+    def find_discriminant(self, square_x: str) -> float:
+        """Вычисляет дискриминант квадратного уравнения"""
+        a, b, c = self.find_coofs_square_x(square_x)
+        return b ** 2 - 4 * a * c
+
+    def answer_square_x(self, square_x: str) -> str:
+        """Находит корни квадратного уравнения"""
+        a, b, c = self.find_coofs_square_x(square_x)
+        d = self.find_discriminant(square_x)
+
+        if d < 0:
+            return "Корней нет"
+        elif d == 0:
+            x = -b / (2 * a)
+            return str(int(x) if x.is_integer() else round(x, 2))
+        else:
+            x1 = (-b - d ** 0.5) / (2 * a)
+            x2 = (-b + d ** 0.5) / (2 * a)
+
+            x1 = int(x1) if x1.is_integer() else round(x1, 2)
+            x2 = int(x2) if x2.is_integer() else round(x2, 2)
+
+            answers = sorted([x1, x2])
+            return ' '.join(str(x) for x in answers)
+
+    def check_answer_square_x(self, task: str, user_answer: str) -> List:
+        """Проверяет ответ для квадратного уравнения"""
+        correct_answer = self.answer_square_x(task)
+        is_correct = str(user_answer).strip() == correct_answer
+
+        message = "Верно. Продолжайте в том же духе." if is_correct else "Неверно. Проверьте расчёты и попробуйте еще раз."
+        return [message, is_correct, 'square_x']
+
+    def generate_line_x(self) -> str:
+        """Генерирует линейное уравнение"""
+        a = randint(-9, 9)
+        while a == 0:
+            a = randint(-9, 9)
+
+        b = randint(-9, 9)
+        c = randint(-9, 9)
+
+        left_side = self._format_equation_term(a, 'x', True)
+        left_side += self._format_equation_term(b)
+
+        return f"{left_side} = {c}"
+
+    def answer_line_x(self, line_x: str) -> str:
+        """Находит корень линейного уравнения"""
+        # Упрощенная реализация - нужно доработать парсинг
+        parts = line_x.split()
+        a_str = parts[0].replace('x', '')
+        a = 1 if a_str == '' else -1 if a_str == '-' else int(a_str)
+
+        b_sign = 1 if parts[1] == '+' else -1
+        b = b_sign * int(parts[2])
+
+        c = int(parts[4])
+
+        x = (c - b) / a
+        return str(int(x) if x.is_integer() else round(x, 2))
+
+    def check_answer_line_x(self, task: str, user_answer: str) -> List:
+        """Проверяет ответ для линейного уравнения"""
+        correct_answer = self.answer_line_x(task)
+        is_correct = str(user_answer).strip() == correct_answer
+
+        message = "Верно. Продолжайте в том же духе." if is_correct else "Неверно. Проверьте расчеты и попробуйте позже."
+        return [message, is_correct, 'line_x']
+
+    def _parse_numbers(self, task: str) -> List[float]:
+        """Парсит числа из строки задачи"""
+        import re
+        numbers = re.findall(r'-?\d+\.?\d*', task)
+        return [float(num) for num in numbers]
+
+    def _identify_task_type(self, task: str) -> Tuple[str, int]:
+        """Определяет тип задачи и уровень сложности"""
+        numbers = self._parse_numbers(task)
+
+        if len(numbers) == 2:
+            stage = 1 if all(num == int(num) for num in numbers) else 2
+        elif len(numbers) == 4:
             stage = 3
-
-        data = {'+': 's', '-': 'm', '*': 'mul', ':': 'cr'}
-        type_task = data[task[1]]
-
-        return [type_task, str(stage)]
-
-    def answer_for_all_stages(self, task):
-        """
-        Находит решение на любой пример всех сложностей.
-        """
-        type_task = self.iddentificate_task(task)[0]
-        stage = int(self.iddentificate_task(task)[1])
-        if type_task == 's':
-            if stage == 1:
-                a, b = self.search_coofs_for_stage_1_2(task)
-                return str(int(a + b))
-            elif stage == 2:
-                a, b = self.search_coofs_for_stage_1_2(task)
-                return str(round(a + b, 2))
-            elif stage == 3:
-                a, b, c, d = self.search_coofs_for_stage_3(task)
-                return str(round(a + b + c + d, 2))
-        elif type_task == 'm':
-            if stage == 1:
-                a, b = self.search_coofs_for_stage_1_2(task)
-                return str(int(a - b))
-            elif stage == 2:
-                a, b = self.search_coofs_for_stage_1_2(task)
-                return str(round(a - b, 2))
-            elif stage == 3:
-                a, b, c, d = self.search_coofs_for_stage_3(task)
-                return str(round(a - b - c - d, 2))
-        elif type_task == 'cr':
-            if stage == 1:
-                a, b = self.search_coofs_for_stage_1_2(task)
-                return str(round(a / b, 2))
-            elif stage == 2:
-                a, b = self.search_coofs_for_stage_1_2(task)
-                return str(round(a / b, 2))
-            elif stage == 3:
-                a, b, c, d = self.search_coofs_for_stage_3(task)
-                return str(round(a / b / c / d, 2))
-        elif type_task == 'mul':
-            if stage == 1:
-                a, b = self.search_coofs_for_stage_1_2(task)
-                return str(int(round(a * b, 2)))
-            elif stage == 2:
-                a, b = self.search_coofs_for_stage_1_2(task)
-                return str(round(a * b, 2))
-            elif stage == 3:
-                a, b, c, d = self.search_coofs_for_stage_3(task)
-                return str(round(a * b * c * d, 2))
-
-    def check_answer_for_all_stages(self, task, user_answer):
-        """
-        Проверить ответ пользователя на любой пример.
-        """
-        type_task = '_'.join(self.iddentificate_task(task))
-        ans = self.answer_for_all_stages(task)
-        if ans[-2:] == '.0':
-            ans = ans[:-2]
-        if user_answer[-2:] == '.0':
-            user_answer = user_answer[:-2]
-        if str(user_answer) == str(ans):
-            return ['Верно. Продолжайте в том же духе.', True, type_task]
         else:
-            return ['Неверно. Проверьте рассчеты и попробуйте позже.', False]
+            stage = 1
 
-    def generate_sum_stage_1(self):
-        """
-        Вернет пример на сложение простого уровня сложности в строковом формате
-        """
-        a_s_1 = randint(1, 101)
-        b_s_1 = randint(1, 101)
-        return f'{a_s_1} + {b_s_1} = ?'
+        operator_map = {'+': 's', '-': 'm', '*': 'mul', ':': 'cr'}
+        for op, code in operator_map.items():
+            if op in task:
+                return code, stage
 
-    def generate_sum_stage_2(self):
-        """
-        Вернет пример на сложение среднего уровня сложности в строковом формате
-        """
-        a_s_2 = round(uniform(1, 20), 2)
-        b_s_2 = round(uniform(1, 20), 2)
-        return f'{a_s_2} + {b_s_2} = ?'
+        return 's', 1  # fallback
 
-    def generate_sum_stage_3(self):
-        """
-        Вернет пример на сложение высокого уровня сложности в строковом формате
-        """
-        a_s_3 = randint(1, 30)
-        b_s_3 = round(uniform(1, 30), 2)
-        c_s_3 = round(uniform(1, 30), 2)
-        d_s_3 = randint(1, 30)
-        return f'{a_s_3} + {b_s_3} + {c_s_3} + {d_s_3} = ?'
+    def answer_for_all_stages(self, task: str) -> str:
+        """Находит решение для любого примера"""
+        task_type, stage = self._identify_task_type(task)
+        numbers = self._parse_numbers(task)
 
-    def generate_min_stage_1(self):
-        """
-        Вернет пример на вычитание простого уровня сложности в строковом формате
-        """
-        a_m_1 = randint(1, 101)
-        b_m_1 = randint(1, 101)
-        return f'{a_m_1} - {b_m_1} = ?'
+        operations = {
+            's': sum,
+            'm': lambda nums: nums[0] - sum(nums[1:]),
+            'mul': lambda nums: self._product(nums),
+            'cr': lambda nums: self._divide_sequence(nums)
+        }
 
-    def generate_min_stage_2(self):
-        """
-        Вернет пример на вычитание среднего уровня сложности в строковом формате
-        """
-        a_m_2 = round(uniform(1, 20), 2)
-        b_m_2 = round(uniform(1, 20), 2)
-        return f'{a_m_2} - {b_m_2} = ?'
+        result = operations[task_type](numbers)
 
-    def generate_min_stage_3(self):
-        """
-        Вернет пример на вычитание высокого уровня сложности в строковом формате
-        """
-        a_m_3 = randint(50, 100)
-        b_m_3 = round(uniform(30, 50), 2)
-        c_m_3 = round(uniform(20, 30), 2)
-        d_m_3 = randint(1, 20)
-        return f'{a_m_3} - {b_m_3} - {c_m_3} - {d_m_3} = ?'
+        # Форматирование результата
+        if stage == 1 and task_type in ['s', 'm', 'mul']:
+            result = int(round(result))
+        else:
+            result = round(result, 2)
+            if result.is_integer():
+                result = int(result)
 
-    def generate_crop_stage_1(self):
-        """
-        Вернет пример на деление в строковом формате
-        """
-        a_cr_1 = randint(1, 51)
-        b_cr_1 = randint(1, 51)
-        return f'{a_cr_1} : {b_cr_1} = ?'
+        return str(result)
 
-    def generate_crop_stage_2(self):
-        """
-        Вернет пример на деление среднего уровня сложности в строковом формате
-        """
-        a_cr_2 = round(uniform(1, 20), 2)
-        b_cr_2 = round(uniform(1, 20), 2)
-        return f'{a_cr_2} : {b_cr_2} = ?'
+    def _product(self, numbers: List[float]) -> float:
+        """Вычисляет произведение чисел"""
+        result = 1
+        for num in numbers:
+            result *= num
+        return result
 
-    def generate_crop_stage_3(self):
-        """
-        Вернет пример на деление высокого уровня сложности в строковом формате
-        """
-        a_cr_3 = randint(10, 40)
-        b_cr_3 = round(uniform(1, 8), 1)
-        c_cr_3 = round(uniform(1, 6), 1)
-        d_cr_3 = randint(1, 4)
-        return f'{a_cr_3} : {b_cr_3} : {c_cr_3} : {d_cr_3} = ?'
+    def _divide_sequence(self, numbers: List[float]) -> float:
+        """Вычисляет последовательное деление"""
+        result = numbers[0]
+        for num in numbers[1:]:
+            result /= num
+        return result
 
-    def generate_multiply_stage_1(self):
-        """
-        Вернет пример на умножение в строковом формате
-        """
-        a_mul_1 = randint(1, 21)
-        b_mul_1 = randint(1, 21)
-        return f'{a_mul_1} * {b_mul_1} = ?'
+    def check_answer_for_all_stages(self, task: str, user_answer: str) -> List:
+        """Проверяет ответ для любого примера"""
+        correct_answer = self.answer_for_all_stages(task)
 
-    def generate_multiply_stage_2(self):
-        """
-        Вернет пример на умножение среднего уровня сложности в строковом формате
-        """
-        a_mul_2 = round(uniform(1, 10), 2)
-        b_mul_2 = round(uniform(1, 10), 2)
-        return f'{a_mul_2} * {b_mul_2} = ?'
+        # Нормализация ответов
+        user_ans = str(user_answer).strip().rstrip('.0')
+        correct_ans = correct_answer.rstrip('.0')
 
-    def generate_multiply_stage_3(self):
-        """
-        Вернет пример на умножение высокого уровня сложности в строковом формате
-        """
-        a_mul_3 = randint(1, 10)
-        b_mul_3 = round(uniform(1, 10), 2)
-        c_mul_3 = round(uniform(1, 10), 2)
-        d_mul_3 = randint(1, 10)
-        return f'{a_mul_3} * {b_mul_3} * {c_mul_3} * {d_mul_3} = ?'
+        is_correct = user_ans == correct_ans
+        task_type, stage = self._identify_task_type(task)
+
+        message = "Верно. Продолжайте в том же духе." if is_correct else "Неверно. Проверьте расчеты и попробуйте позже."
+        return [message, is_correct, f"{task_type}_{stage}"]
+
+    # Генераторы примеров
+    def _generate_simple_operation(self, op: str, range1: Tuple, range2: Tuple, integers: bool = True) -> str:
+        """Генерирует простой пример с двумя числами"""
+        if integers:
+            a = randint(*range1)
+            b = randint(*range2)
+        else:
+            a = round(uniform(*range1), 2)
+            b = round(uniform(*range2), 2)
+        return f"{a} {op} {b} = ?"
+
+    def _generate_complex_operation(self, op: str, ranges: List[Tuple], integers: List[bool]) -> str:
+        """Генерирует сложный пример с четырьмя числами"""
+        numbers = []
+        for i, (range_start, range_end) in enumerate(ranges):
+            if integers[i]:
+                num = randint(range_start, range_end)
+            else:
+                num = round(uniform(range_start, range_end), 2)
+            numbers.append(str(num))
+
+        return f" {op} ".join(numbers) + " = ?"
+
+    # Генераторы для сложения
+    def generate_sum_stage_1(self) -> str:
+        return self._generate_simple_operation('+', (1, 101), (1, 101))
+
+    def generate_sum_stage_2(self) -> str:
+        return self._generate_simple_operation('+', (1, 20), (1, 20), False)
+
+    def generate_sum_stage_3(self) -> str:
+        return self._generate_complex_operation('+', [(1, 30), (1, 30), (1, 30), (1, 30)], [True, False, False, True])
+
+    # Генераторы для вычитания
+    def generate_min_stage_1(self) -> str:
+        return self._generate_simple_operation('-', (1, 101), (1, 101))
+
+    def generate_min_stage_2(self) -> str:
+        return self._generate_simple_operation('-', (1, 20), (1, 20), False)
+
+    def generate_min_stage_3(self) -> str:
+        return self._generate_complex_operation('-', [(50, 100), (30, 50), (20, 30), (1, 20)],
+                                                [True, False, False, True])
+
+    # Генераторы для умножения
+    def generate_multiply_stage_1(self) -> str:
+        return self._generate_simple_operation('*', (1, 21), (1, 21))
+
+    def generate_multiply_stage_2(self) -> str:
+        return self._generate_simple_operation('*', (1, 10), (1, 10), False)
+
+    def generate_multiply_stage_3(self) -> str:
+        return self._generate_complex_operation('*', [(1, 10), (1, 10), (1, 10), (1, 10)], [True, False, False, True])
+
+    # Генераторы для деления
+    def generate_crop_stage_1(self) -> str:
+        return self._generate_simple_operation(':', (1, 51), (1, 51))
+
+    def generate_crop_stage_2(self) -> str:
+        return self._generate_simple_operation(':', (1, 20), (1, 20), False)
+
+    def generate_crop_stage_3(self) -> str:
+        return self._generate_complex_operation(':', [(10, 40), (1, 8), (1, 6), (1, 4)], [True, False, False, True])

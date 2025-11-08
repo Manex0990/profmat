@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Мои группы</h1>
+<ul>
+    {% for group in groups %}
+    <li><a href="/student_groups/{{ group.id }}">{{ group.name }}</a></li>
+    {% endfor %}
+    {{ line }}
+</ul>
+{% endblock %}

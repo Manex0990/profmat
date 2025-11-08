@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Группа: {{ group.name }}</h1>
+
+<p>Пригласительная ссылка:
+    <a href="{{ url_for('join_group', invite_link=group.invite_link, _external=True) }}">
+        {{ url_for('join_group', invite_link=group.invite_link, _external=True) }}
+    </a>
+</p>
+
+<form method="post" action="{{ url_for('regenerate_invite_link', group_id=group.id) }}">
+    <button type="submit">Сгенерировать новую ссылку</button>
+</form>
+
+<h2>Участники</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Имя</th>
+            <th>Баллы</th>
+            <th>Роль</th>
+            <th>Начислить баллы</th>
+            <th>Удалить</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for member in members %}
+        <tr>
+            <td>{{ member.user.surname }} {{ member.user.name }}</td>
+            <td>{{ member.points }}</td>
+            <td>{{ "Учитель" if member.is_teacher else "Ученик" }}</td>
+
+            <td>
+                {% if not member.is_teacher %}
+                <form method="post" action="{{ url_for('add_points', group_id=group.id, user_id=member.user.id) }}">
+                    <input type="number" name="points" value="1" min="1">
+                    <button type="submit">+</button>
+                </form>
+                {% endif %}
+            </td>
+
+            <td>
+                {% if not member.is_teacher %}
+                <form method="post" action="{{ url_for('remove_member', group_id=group.id, user_id=member.user.id) }}">
+                    <button type="submit" onclick="return confirm('Удалить участника?')">Удалить</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

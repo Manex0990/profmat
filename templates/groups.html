@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Мои группы</h1>
+<ul>
+    {% for group in groups %}
+    <li><a href="/group/{{ group.id }}">{{ group.name }}</a></li>
+    {% endfor %}
+</ul>
+<a href="/group/create">Создать новую группу</a>
+{% endblock %}

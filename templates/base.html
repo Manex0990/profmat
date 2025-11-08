@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{{ title }}</title>
+</head>
+<body>
+<header>
+    <nav>
+        <ul>
+            {% if current_user.is_authenticated %}
+            <li><a href="/">Домашняя страница</a></li>
+            <li><a href="/groups">Список групп</a></li>
+             <li><a href="/student_groups">Мои группы</a></li>
+            <li><a href="/profile">Профиль</a></li>
+            <li><a href="/logout">Выход</a></li>
+            {% else %}
+            <li><a href="/login">Войти</a></li>
+            <li><a href="/register">Зарегистрироваться</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</header>
+<main>
+    {% block content %}{% endblock %}
+</main>
+<footer>
+    <p>&copy; 2025 ggH</p>
+</footer>
+</body>
+</html>

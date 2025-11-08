@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Выбор сложности примера</title>
+</head>
+<body>
+  {% if name == 'sum' %}
+    <body>
+    <a class="navbar-brand" href="/student_groups/{{ group.id }}/task/sum/1">Простой пример на сложение</a>
+    <br />
+    <br />
+<a class="navbar-brand" href="/student_groups/{{ group.id }}/task/sum/2">Средний пример на сложение</a>
+    <br />
+    <br />
+<a class="navbar-brand" href="/student_groups/{{ group.id }}/task/sum/3">Сложный пример на сложение</a>
+    </body>
+{% elif name == 'min' %}
+    <body>
+        <a class="navbar-brand" href="/student_groups/{{ group.id }}/task/min/1">Простой пример на вычитание</a>
+    <br />
+    <br />
+<a class="navbar-brand" href="/student_groups/{{ group.id }}/task/min/2">Средний пример на вычитание</a>
+    <br />
+    <br />
+<a class="navbar-brand" href="/student_groups/{{ group.id }}/task/min/3">Сложный пример на вычитание</a>
+    </body>
+{% elif name == 'mul' %}
+    <body>
+        <a class="navbar-brand" href="/student_groups/{{ group.id }}/task/mul/1">Простой пример на умножение</a>
+    <br />
+    <br />
+<a class="navbar-brand" href="/student_groups/{{ group.id }}/task/mul/2">Средний пример на умножение</a>
+    <br />
+    <br />
+<a class="navbar-brand" href="/student_groups/{{ group.id }}/task/mul/3">Сложный пример на умножение</a>
+    </body>
+{% elif name == 'crop' %}
+    <body>
+        <a class="navbar-brand" href="/student_groups/{{ group.id }}/task/crop/1">Простой пример на деление</a>
+    <br />
+    <br />
+<a class="navbar-brand" href="/student_groups/{{ group.id }}/task/crop/2">Средний пример на деление</a>
+    <br />
+    <br />
+<a class="navbar-brand" href="/student_groups/{{ group.id }}/task/crop/3">Сложный пример на деление</a>
+    </body>
+{% endif %}
+  <br />
+  <br />
+  <br />
+<a class="navbar-brand" href="/student_groups/{{ group.id }}/task">Назад</a>
+</body>
+</html>

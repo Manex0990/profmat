@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ group.name }}</h1>
+<li><a href="/student_groups/{{ group.id }}/task">Решать задачи</a></li>
+
+<h2>Участники группы:</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Имя</th>
+        <th>Баллы</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for member in members %}
+    <tr>
+        <td>{{ member.user.name }} {{ member.user.surname }}</td>
+        <td>{{ member.points }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

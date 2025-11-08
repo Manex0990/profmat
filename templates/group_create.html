@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Создание группы</h1>
+<form class="login_form" method="post">
+    {{ form.csrf_token }}
+    <p>
+        {{ form.name.label }}<br>
+        {{ form.name }}<br>
+        {% for error in form.name.errors %}
+    <p class="alert alert-danger" role="alert">
+        {{ error }}
+    </p>
+    {% endfor %}
+    </p>
+    <p>{{ form.submit(type="submit") }}</p>
+</form>
+{% endblock %}

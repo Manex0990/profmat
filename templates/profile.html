@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Профиль пользователя</h2>
+  {% if user.avatar %}
+    <img src="{{ user.avatar }}" alt="Аватар" style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%;">
+  {% else %}
+    <p>Аватар не загружен</p>
+  {% endif %}
+  <p><strong>Фамилия:</strong> {{ user.surname }}</p>
+  <p><strong>Имя:</strong> {{ user.name }}</p>
+  <p><strong>Отчество:</strong> {{ user.patronymic }}</p>
+  <p><strong>Email:</strong> {{ user.email }}</p>
+  <p><strong>Роль:</strong> {{ 'Учитель' if user.teacher else 'Ученик' }}</p>
+  <a href="{{ url_for('edit_profile') }}">Редактировать профиль</a>
+{% endblock %}

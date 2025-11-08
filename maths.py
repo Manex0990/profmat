@@ -1,5 +1,6 @@
 from random import randint, uniform
 from typing import List, Tuple
+import re
 
 
 class MyMath:
@@ -30,19 +31,6 @@ class MyMath:
         else:
             return f"{sign}{abs_coeff}" if not is_first else str(abs_coeff)
 
-    def _parse_coefficient(self, term: str) -> int:
-        """Парсит коэффициент из строки"""
-        if term == 'x' or term == '+x':
-            return 1
-        elif term == '-x':
-            return -1
-        elif term.startswith('+'):
-            return int(term[1:-1]) if 'x' in term else int(term[1:])
-        elif term.startswith('-'):
-            return -int(term[1:-1]) if 'x' in term else -int(term[1:])
-        else:
-            return int(term[:-1]) if 'x' in term else int(term)
-
     def generate_square_x(self) -> str:
         """Генерирует квадратное уравнение в строковом формате"""
         a = randint(-3, 5)
@@ -60,19 +48,42 @@ class MyMath:
         return f"{equation} = 0"
 
     def find_coofs_square_x(self, square_x: str) -> List[int]:
-        """Находит коэффициенты квадратного уравнения"""
-        # Упрощенный парсинг - в реальном коде нужно доработать
-        parts = square_x.replace('x²', ' ').replace('x', ' ').replace('+', ' +').replace('-', ' -').split()
-
         a = b = c = 0
-        for part in parts:
-            if '²' in part:
-                a = self._parse_coefficient(part)
-            elif part.replace('.', '').replace('-', '').isdigit():
-                if parts.index(part) > parts.index([p for p in parts if '²' in p][0]):
-                    c = self._parse_coefficient(part)
+
+        # Убираем пробелы и "= 0"
+        equation = square_x.replace(' ', '').replace('=0', '')
+
+        # Шаблоны для поиска
+        x2_pattern = r'([+-]?\d*)x²'
+        x_pattern = r'([+-]?\d*)x(?!²)'  # x но не x²
+        const_pattern = r'([+-]?\d+)(?!.*x)'
+
+        # Ищем x²
+        x2_match = re.search(x2_pattern, equation)
+        if x2_match:
+            coeff = x2_match.group(1)
+            if not coeff or coeff == '+':
+                a = 1
+            elif coeff == '-':
+                a = -1
             else:
-                b = self._parse_coefficient(part)
+                a = int(coeff)
+
+        # Ищем x
+        x_match = re.search(x_pattern, equation)
+        if x_match:
+            coeff = x_match.group(1)
+            if not coeff or coeff == '+':
+                b = 1
+            elif coeff == '-':
+                b = -1
+            else:
+                b = int(coeff)
+
+        # Ищем свободный член
+        const_match = re.search(const_pattern, equation)
+        if const_match:
+            c = int(const_match.group(1))
 
         return [a, b, c]
 

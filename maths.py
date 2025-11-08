@@ -12,6 +12,16 @@ class MyMath:
             ':': 'cr'
         }
 
+    def generate_random_numbers(self):
+        a, b, c = 0, 0, 0
+        while a == 0:
+            a = randint(-9, 9)
+        while b == 0:
+            b = randint(-9, 9)
+        while c == 0:
+            c = randint(-9, 9)
+        return a, b, c
+
     def _format_equation_term(self, coeff: int, variable: str = '', is_first: bool = False) -> str:
         """Форматирует коэффициент уравнения"""
         if coeff == 0:
@@ -33,12 +43,7 @@ class MyMath:
 
     def generate_square_x(self) -> str:
         """Генерирует квадратное уравнение в строковом формате"""
-        a = randint(-3, 5)
-        while a == 0:
-            a = randint(-3, 5)
-
-        b = randint(-9, 9)
-        c = randint(-9, 9)
+        a, b, c = self.generate_random_numbers()
 
         # Формируем уравнение
         equation = self._format_equation_term(a, 'x²', True)
@@ -122,12 +127,7 @@ class MyMath:
 
     def generate_line_x(self) -> str:
         """Генерирует линейное уравнение"""
-        a = randint(-9, 9)
-        while a == 0:
-            a = randint(-9, 9)
-
-        b = randint(-9, 9)
-        c = randint(-9, 9)
+        a, b, c = self.generate_random_numbers()
 
         left_side = self._format_equation_term(a, 'x', True)
         left_side += self._format_equation_term(b)
@@ -152,7 +152,11 @@ class MyMath:
     def check_answer_line_x(self, task: str, user_answer: str) -> List:
         """Проверяет ответ для линейного уравнения"""
         correct_answer = self.answer_line_x(task)
-        is_correct = str(user_answer).strip() == correct_answer
+
+        user_ans = str(user_answer).strip().rstrip('.0')
+        correct_ans = correct_answer.rstrip('.0')
+
+        is_correct = str(user_ans).strip() == correct_ans
 
         message = "Верно. Продолжайте в том же духе." if is_correct else "Неверно. Проверьте расчеты и попробуйте позже."
         return [message, is_correct, 'line_x']
@@ -186,12 +190,10 @@ class MyMath:
         task_type, stage = self._identify_task_type(task)
         numbers = self._parse_numbers(task)
 
-        operations = {
-            's': sum,
-            'm': lambda nums: nums[0] - sum(nums[1:]),
-            'mul': lambda nums: self._product(nums),
-            'cr': lambda nums: self._divide_sequence(nums)
-        }
+        operations = {'s': sum,
+                      'm': lambda nums: nums[0] - sum(nums[1:]),
+                      'mul': lambda nums: self._product(nums),
+                      'cr': lambda nums: self._divide_sequence(nums)}
 
         result = operations[task_type](numbers)
 

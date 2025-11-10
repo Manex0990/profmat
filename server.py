@@ -21,37 +21,51 @@ login_manager.login_view = 'login'
 
 db_session.global_init("db/web.db")
 ex = MyMath()
-names = {'square': 'Квадратное уравнение',
-         'line': 'Линейное уравнение',
-         'sum_1': 'Пример на сложение (простой)',
-         'sum_2': 'Пример на сложение (средний)',
-         'sum_3': 'Пример на сложение (сложный)',
-         'min_1': 'Пример на вычитание (простой)',
-         'min_2': 'Пример на вычитание (средний)',
-         'min_3': 'Пример на вычитание (сложный)',
-         'mul_1': 'Пример на умножение (простой)',
-         'mul_2': 'Пример на умножение (средний)',
-         'mul_3': 'Пример на умножение (сложный)',
-         'crop_1': 'Пример на деление (простой)',
-         'crop_2': 'Пример на деление (средний)',
-         'crop_3': 'Пример на деление (сложный)'}
-funcs = {'Квадратное уравнение': [ex.generate_quadratic_equation, ex.check_answer_quadratic_equation],
-         'Линейное уравнение': [ex.generate_linear_equation, ex.check_answer_linear_equation],
-         'Пример на сложение (простой)': [ex.generate_sum_stage_1, ex.check_answer_for_all_stages],
-         'Пример на сложение (средний)': [ex.generate_sum_stage_2, ex.check_answer_for_all_stages],
-         'Пример на сложение (сложный)': [ex.generate_sum_stage_3, ex.check_answer_for_all_stages],
-         'Пример на вычитание (простой)': [ex.generate_min_stage_1, ex.check_answer_for_all_stages],
-         'Пример на вычитание (средний)': [ex.generate_min_stage_2, ex.check_answer_for_all_stages],
-         'Пример на вычитание (сложный)': [ex.generate_min_stage_3, ex.check_answer_for_all_stages],
-         'Пример на умножение (простой)': [ex.generate_multiply_stage_1, ex.check_answer_for_all_stages],
-         'Пример на умножение (средний)': [ex.generate_multiply_stage_2, ex.check_answer_for_all_stages],
-         'Пример на умножение (сложный)': [ex.generate_multiply_stage_3, ex.check_answer_for_all_stages],
-         'Пример на деление (простой)': [ex.generate_crop_stage_1, ex.check_answer_for_all_stages],
-         'Пример на деление (средний)': [ex.generate_crop_stage_2, ex.check_answer_for_all_stages],
-         'Пример на деление (сложный)': [ex.generate_crop_stage_3, ex.check_answer_for_all_stages]}
+
+TASK_CONFIG = {'square': {'name': 'Квадратное уравнение',
+                          'generate_func': ex.generate_quadratic_equation,
+                          'check_func': ex.check_answer_quadratic_equation,
+                          'points': 20,
+                          'get_solution': lambda task: [
+                              'Сначала найдем дискриминант квадратного уравнения:',
+                              'Если дискриминант больше нуля, то будет 2 корня',
+                              'Если равен нулю, то будет 1 корень',
+                              'Если меньше нуля, то корней нет.',
+                              f'D = b² - 4ac; D = {ex.find_discriminant(task)}',
+                              'Теперь можно найти корни(корень) уравнения',
+                              'x1 = (-b - √D) / 2a',
+                              'x2 = (-b + √D) / 2a',
+                              f'Ответ: {ex.answer_quadratic_equation(task)}']},
+               'line': {'name': 'Линейное уравнение',
+                        'generate_func': ex.generate_linear_equation,
+                        'check_func': ex.check_answer_linear_equation,
+                        'points': 15,
+                        'get_solution': lambda task:
+                        ['Для того, чтобы решить линейное уравнение нужно все коэффициенты с "х"',
+                         'перенести в одну часть уравнения, а остальные в другую.',
+                         f'Ответ: {ex.answer_linear_equation(task)}']}}
+
+# Конфигурация для примеров
+EXAMPLES_CONFIG = {'sum': {'name': 'Пример на сложение', 'points': [5, 8, 10]},
+                   'min': {'name': 'Пример на вычитание', 'points': [5, 8, 10]},
+                   'mul': {'name': 'Пример на умножение', 'points': [7, 10, 12]},
+                   'crop': {'name': 'Пример на деление', 'points': [10, 12, 15]}}
+
+# Генерация функций для примеров
+for operation, config in EXAMPLES_CONFIG.items():
+    for level in range(1, 4):
+        key = f'{operation}_{level}'
+        TASK_CONFIG[key] = {'name': f'{config["name"]} ({["простой", "средний", "сложный"][level - 1]})',
+                            'generate_func': getattr(ex, f'generate_{operation}_stage_{level}'),
+                            'check_func': ex.check_answer_for_all_stages,
+                            'points': config['points'][level - 1],
+                            'get_solution': lambda task, op=config['name']:
+                            [f'Просто {["сложим", "вычтем", "перемножим", "разделим"][["sum", "min", "mul", "crop"].index(operation)]} все коэффициенты',
+                             f'Ответ: {ex.answer_for_all_stages(task)}']}
 
 
 def update_points(group_id, user_id, points):
+    """Обновление баллов пользователя"""
     db_sess = db_session.create_session()
     try:
         member = db_sess.query(GroupMember).filter_by(group_id=group_id, user_id=user_id).first()
@@ -62,157 +76,92 @@ def update_points(group_id, user_id, points):
         db_sess.close()
 
 
-@app.route('/student_groups/<int:group_id>/task/square', methods=['GET', 'POST'])
-@login_required
-def open_task_square(group_id):
+def validate_group_access(group_id, user_id):
+    """Проверка доступа пользователя к группе"""
     db_sess = db_session.create_session()
     try:
         group = db_sess.query(Group).filter(Group.id == group_id).first()
         if not group:
             flash("Группа не найдена", "error")
-            return redirect(url_for('student_groups'))
+            return None, None
 
-        group_member = db_sess.query(GroupMember).filter_by(user_id=current_user.id, group_id=group_id).first()
-
+        group_member = db_sess.query(GroupMember).filter_by(user_id=user_id, group_id=group_id).first()
         if not group_member:
             flash("Вы не состоите в этой группе!", "error")
-            return redirect(url_for('student_groups'))
+            return None, None
 
-        task = str(request.cookies.get('cur_task_square', funcs[names['square']][0]()))
-        form = TaskForm()
-        title_html = names['square']
-        page = make_response(render_template('task_opened.html', title=title_html, group=group,
-                                             task=task, form=form))
-        page.set_cookie('cur_task_square', value=str(task), max_age=60 * 60 * 24 * 365 * 2)
-        solution_generation = ['Сначала найдем дискриминант квадратного уравнения:',
-                               'Если дискриманант больше нуля, то будет 2 корня',
-                               'Если равен нулю, то будет 1 корень',
-                               'Если меньше нуля, то Корней нет.',
-                               f'D = b\u00B2 - 4ac; D = {ex.find_discriminant(task)}',
-                               'Теперь можно найти корни(корень) уравнения',
-                               'x1 = (-b - \u221AD) / 2a',
-                               'x2 = (-b + \u221AD) / 2a',
-                               f'Ответ: {ex.answer_quadratic_equation(task)}']
-        if request.method == 'POST':
-            user_answer = form.answer.data
-            verdict = funcs[names['square']][1](task, user_answer)
-            if verdict[1]:
-                update_points(group_id, current_user.id, 20)
-                res = make_response(
-                    render_template('task_opened.html', title=title_html, task=task, group=group,
-                                    form=form, solution_log=solution_generation, message=verdict[0]))
-                res.set_cookie('cur_task_square', '', max_age=0)
-            else:
-                res = make_response(
-                    render_template('task_opened.html', title=title_html, task=task, group=group,
-                                    form=form, solution_log=['Дайте верный ответ, чтобы получить решение.'],
-                                    message=verdict[0]))
-            return res
-        return page
+        return group, group_member
     finally:
         db_sess.close()
+
+
+def handle_task_request(group_id, task_key, cookie_name, template_name='task_opened.html'):
+    """Универсальный обработчик для всех типов задач"""
+    group, group_member = validate_group_access(group_id, current_user.id)
+    if not group:
+        return redirect(url_for('student_groups'))
+
+    config = TASK_CONFIG[task_key]
+    task = str(request.cookies.get(cookie_name, config['generate_func']()))
+    form = TaskForm()
+
+    if request.method == 'GET':
+        response = make_response(render_template(
+            template_name,
+            title=config['name'],
+            group=group,
+            task=task,
+            form=form
+        ))
+        response.set_cookie(cookie_name, value=str(task), max_age=60 * 60 * 24 * 365 * 2)
+        return response
+
+    # POST запрос
+    user_answer = form.answer.data
+    verdict = config['check_func'](task, user_answer)
+
+    if verdict[1]:
+        update_points(group_id, current_user.id, config['points'])
+        solution_log = config['get_solution'](task)
+        message_type = 'success'
+    else:
+        solution_log = ['Дайте верный ответ, чтобы получить решение.']
+        message_type = 'error'
+
+    response = make_response(render_template(template_name, title=config['name'], group=group, task=task,
+                                             form=form, solution_log=solution_log, message=verdict[0],
+                                             message_type=message_type))
+
+    if verdict[1]:
+        response.set_cookie(cookie_name, '', max_age=0)
+
+    return response
+
+
+# Упрощенные маршруты
+@app.route('/student_groups/<int:group_id>/task/square', methods=['GET', 'POST'])
+@login_required
+def open_task_square(group_id):
+    return handle_task_request(group_id, 'square', 'cur_task_square')
 
 
 @app.route('/student_groups/<int:group_id>/task/line', methods=['GET', 'POST'])
 @login_required
 def open_task_line(group_id):
-    db_sess = db_session.create_session()
-    try:
-        group = db_sess.query(Group).filter(Group.id == group_id).first()
-
-        if not group:
-            flash("Группа не найдена", "error")
-            return redirect(url_for('student_groups'))
-
-        group_member = db_sess.query(GroupMember).filter_by(user_id=current_user.id, group_id=group_id).first()
-        if not group_member:
-            flash("Вы не состоите в этой группе!", "error")
-            return redirect(url_for('student_groups'))
-
-        task = str(request.cookies.get('cur_task_line', funcs[names['line']][0]()))
-        form = TaskForm()
-        title_html = names['line']
-        page = make_response(render_template('task_opened.html', title=title_html, group=group,
-                                             task=task, form=form))
-        page.set_cookie('cur_task_line', value=str(task), max_age=60 * 60 * 24 * 365 * 2)
-        solution_generation = ['Для того, чтобы решить линейное уравнение нужно все коэффициенты с "х"',
-                               'перенести в одну часть уравнения, а остальные в другую.',
-                               f'Ответ: {ex.answer_linear_equation(task)}']
-        if request.method == 'POST':
-            user_answer = form.answer.data
-            verdict = funcs[names['line']][1](task, user_answer)
-            if verdict[1]:
-                update_points(group_id, current_user.id, 15)
-                res = make_response(
-                    render_template('task_opened.html', title=title_html, task=task, group=group,
-                                    form=form, solution_log=solution_generation, message=verdict[0]))
-                res.set_cookie('cur_task_line', '', max_age=0)
-            else:
-                res = make_response(
-                    render_template('task_opened.html', title=title_html, task=task, group=group,
-                                    form=form, solution_log=['Дайте верный ответ, чтобы получить решение.'],
-                                    message=verdict[0]))
-            return res
-        return page
-    finally:
-        db_sess.close()
+    return handle_task_request(group_id, 'line', 'cur_task_line')
 
 
-@app.route('/student_groups/<int:group_id>/task/<title>/<level>', methods=['GET', 'POST'])
+@app.route('/student_groups/<int:group_id>/task/<operation>/<int:level>', methods=['GET', 'POST'])
 @login_required
-def open_task_examples_all_stages(group_id, title, level):
-    points_data = {'sum_1': 5, 'sum_2': 8, 'sum_3': 10, 'min_1': 5, 'min_2': 8,
-                   'min_3': 10, 'mul_1': 7, 'mul_2': 10,
-                   'mul_3': 12, 'crop_1': 10, 'crop_2': 12, 'crop_3': 15}
-    db_sess = db_session.create_session()
-    try:
-        group = db_sess.query(Group).filter(Group.id == group_id).first()
+def open_task_example(group_id, operation, level):
+    task_key = f'{operation}_{level}'
+    if task_key not in TASK_CONFIG:
+        flash("Задача не найдена", "error")
+        return redirect(url_for('student_groups'))
 
-        if not group:
-            flash("Группа не найдена", "error")
-            return redirect(url_for('student_groups'))
-
-        group_member = db_sess.query(GroupMember).filter_by(user_id=current_user.id, group_id=group_id).first()
-        if not group_member:
-            flash("Вы не состоите в этой группе!", "error")
-            return redirect(url_for('student_groups'))
-
-        full_name = '_'.join([title, level])
-        task = str(request.cookies.get('cur_task_ex', funcs[names[full_name]][0]()))
-        form = TaskForm()
-        title_html = names[full_name]
-        page = make_response(render_template('task_opened.html', title=title_html, group=group,
-                                             task=task, form=form))
-        page.set_cookie('cur_task_ex', value=str(task), max_age=60 * 60 * 24 * 365 * 2)
-        solution_generation = {'Пример на сложение': ['Просто сложим все коэффициенты',
-                                                      f'Ответ: {ex.answer_for_all_stages(task)}'],
-                               'Пример на вычитание': ['Просто вычтем все коэффициенты',
-                                                       f'Ответ: {ex.answer_for_all_stages(task)}'],
-                               'Пример на умножение': ['Просто перемножим все коэффициенты',
-                                                       f'Ответ: {ex.answer_for_all_stages(task)}'],
-                               'Пример на деление': ['Просто разделим по порядку все коэффициенты',
-                                                     f'Ответ: {ex.answer_for_all_stages(task)}']}
-        if request.method == 'POST':
-            user_answer = form.answer.data
-            verdict = funcs[names[full_name]][1](task, user_answer)
-            if verdict[1]:
-                update_points(group_id, current_user.id, points_data[full_name])
-                res = make_response(
-                    render_template('task_opened.html', title=title_html, task=task, form=form, group=group,
-                                    solution_log=solution_generation[title_html[:-10]], message=verdict[0]))
-                res.set_cookie('cur_task_ex', '', max_age=0)
-            else:
-                res = make_response(
-                    render_template('task_opened.html', title=title_html, task=task, group=group,
-                                    form=form, solution_log=['Дайте верный ответ, чтобы получить решение.'],
-                                    message=verdict[0]))
-            return res
-        return page
-    finally:
-        db_sess.close()
+    return handle_task_request(group_id, task_key, 'cur_task_ex')
 
 
-# возможен баг с проверкой примеров из-за (не 5 а 5.0)
 @app.route('/student_groups/<int:group_id>/task', methods=['GET', 'POST'])
 def open_task_menu(group_id):
     db_sess = db_session.create_session()

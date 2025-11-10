@@ -278,13 +278,13 @@ class MyMath:
                                                [True, False, False, True])
 
     # Генераторы для умножения
-    def generate_multiply_stage_1(self) -> str:
+    def generate_mul_stage_1(self) -> str:
         return self.generate_simple_operation('*', (1, 21), (1, 21))
 
-    def generate_multiply_stage_2(self) -> str:
+    def generate_mul_stage_2(self) -> str:
         return self.generate_simple_operation('*', (1, 10), (1, 10), False)
 
-    def generate_multiply_stage_3(self) -> str:
+    def generate_mul_stage_3(self) -> str:
         return self.generate_complex_operation('*', [(1, 10), (1, 10), (1, 10), (1, 10)], [True, False, False, True])
 
     # Генераторы для деления

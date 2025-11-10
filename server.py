@@ -7,7 +7,6 @@ from form.user import RegisterForm, LoginForm, GroupForm
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required
 import uuid
 from form.task import TaskForm
-from maths import MyMath
 from sqlalchemy.orm import joinedload
 from werkzeug.utils import secure_filename
 import os
@@ -77,13 +76,8 @@ def handle_task_request(group_id, task_key, cookie_name, template_name='task_ope
     form = TaskForm()
 
     if request.method == 'GET':
-        response = make_response(render_template(
-            template_name,
-            title=config['name'],
-            group=group,
-            task=task,
-            form=form
-        ))
+        response = make_response(
+            render_template(template_name, title=config['name'], group=group, task=task, form=form))
         response.set_cookie(cookie_name, value=str(task), max_age=60 * 60 * 24 * 365 * 2)
         return response
 

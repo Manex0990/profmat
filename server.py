@@ -35,8 +35,8 @@ names = {'square': 'Квадратное уравнение',
          'crop_1': 'Пример на деление (простой)',
          'crop_2': 'Пример на деление (средний)',
          'crop_3': 'Пример на деление (сложный)'}
-funcs = {'Квадратное уравнение': [ex.generate_square_x, ex.check_answer_square_x],
-         'Линейное уравнение': [ex.generate_line_x, ex.check_answer_line_x],
+funcs = {'Квадратное уравнение': [ex.generate_quadratic_equation, ex.check_answer_quadratic_equation],
+         'Линейное уравнение': [ex.generate_linear_equation, ex.check_answer_linear_equation],
          'Пример на сложение (простой)': [ex.generate_sum_stage_1, ex.check_answer_for_all_stages],
          'Пример на сложение (средний)': [ex.generate_sum_stage_2, ex.check_answer_for_all_stages],
          'Пример на сложение (сложный)': [ex.generate_sum_stage_3, ex.check_answer_for_all_stages],
@@ -92,7 +92,7 @@ def open_task_square(group_id):
                                'Теперь можно найти корни(корень) уравнения',
                                'x1 = (-b - \u221AD) / 2a',
                                'x2 = (-b + \u221AD) / 2a',
-                               f'Ответ: {ex.answer_square_x(task)}']
+                               f'Ответ: {ex.answer_quadratic_equation(task)}']
         if request.method == 'POST':
             user_answer = form.answer.data
             verdict = funcs[names['square']][1](task, user_answer)
@@ -137,7 +137,7 @@ def open_task_line(group_id):
         page.set_cookie('cur_task_line', value=str(task), max_age=60 * 60 * 24 * 365 * 2)
         solution_generation = ['Для того, чтобы решить линейное уравнение нужно все коэффициенты с "х"',
                                'перенести в одну часть уравнения, а остальные в другую.',
-                               f'Ответ: {ex.answer_line_x(task)}']
+                               f'Ответ: {ex.answer_linear_equation(task)}']
         if request.method == 'POST':
             user_answer = form.answer.data
             verdict = funcs[names['line']][1](task, user_answer)

@@ -1,7 +1,7 @@
 from maths import MyMath
 
 ex = MyMath()
-TASK_CONFIG = {'square': {'name': 'Квадратное уравнение',
+TASK_CONFIG = {'quadratic_equation': {'name': 'Квадратное уравнение',
                           'generate_func': ex.generate_quadratic_equation,
                           'check_func': ex.check_answer_quadratic_equation,
                           'points': 20,
@@ -15,7 +15,7 @@ TASK_CONFIG = {'square': {'name': 'Квадратное уравнение',
                               'x1 = (-b - √D) / 2a',
                               'x2 = (-b + √D) / 2a',
                               f'Ответ: {ex.answer_quadratic_equation(task)}']},
-               'line': {'name': 'Линейное уравнение',
+               'linear_equation': {'name': 'Линейное уравнение',
                         'generate_func': ex.generate_linear_equation,
                         'check_func': ex.check_answer_linear_equation,
                         'points': 15,

@@ -104,16 +104,16 @@ def handle_task_request(group_id, task_key, cookie_name, template_name='task_ope
 
 
 # Упрощенные маршруты
-@app.route('/student_groups/<int:group_id>/task/square', methods=['GET', 'POST'])
+@app.route('/student_groups/<int:group_id>/task/quadratic_equation', methods=['GET', 'POST'])
 @login_required
 def open_task_square(group_id):
-    return handle_task_request(group_id, 'square', 'cur_task_square')
+    return handle_task_request(group_id, 'quadratic_equation', 'cur_task_quadratic_equation')
 
 
-@app.route('/student_groups/<int:group_id>/task/line', methods=['GET', 'POST'])
+@app.route('/student_groups/<int:group_id>/task/linear_equation', methods=['GET', 'POST'])
 @login_required
 def open_task_line(group_id):
-    return handle_task_request(group_id, 'line', 'cur_task_line')
+    return handle_task_request(group_id, 'linear_equation', 'cur_task_linear_equation')
 
 
 @app.route('/student_groups/<int:group_id>/task/<operation>/<int:level>', methods=['GET', 'POST'])
@@ -124,7 +124,7 @@ def open_task_example(group_id, operation, level):
         flash("Задача не найдена", "error")
         return redirect(url_for('student_groups'))
 
-    return handle_task_request(group_id, task_key, 'cur_task_ex')
+    return handle_task_request(group_id, task_key, 'cur_task_operation')
 
 
 @app.route('/student_groups/<int:group_id>/task', methods=['GET', 'POST'])
@@ -142,8 +142,8 @@ def open_task_menu(group_id):
             flash("Вы не состоите в этой группе!", "error")
             return redirect(url_for('student_groups'))
         res = make_response(render_template('task_window.html', group=group))
-        res.set_cookie('cur_task_square', '', max_age=0)
-        res.set_cookie('cur_task_line', '', max_age=0)
+        res.set_cookie('cur_task_quadratic_equation', '', max_age=0)
+        res.set_cookie('cur_task_linear_equation', '', max_age=0)
         return res
     finally:
         db_sess.close()
@@ -164,7 +164,7 @@ def open_change_level_window(group_id, name):
             flash("Вы не состоите в этой группе!", "error")
             return redirect(url_for('student_groups'))
         res = make_response(render_template('change_level_window.html', group=group, name=name))
-        res.set_cookie('cur_task_ex', '', max_age=0)
+        res.set_cookie('cur_task_operation', '', max_age=0)
         return res
     finally:
         db_sess.close()

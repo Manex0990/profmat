@@ -10,7 +10,7 @@ from form.task import TaskForm
 from sqlalchemy.orm import joinedload
 from werkzeug.utils import secure_filename
 import os
-from configs import TASK_CONFIG, EXAMPLES_CONFIG, ex
+from configs import TASK_CONFIG, OPERATIONS_CONFIG, ex
 
 app = Flask(__name__, static_folder='static')
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -22,16 +22,17 @@ login_manager.login_view = 'login'
 db_session.global_init("db/web.db")
 
 # Генерация функций для примеров
-for operation, config in EXAMPLES_CONFIG.items():
+for operation, config in OPERATIONS_CONFIG.items():
     for level in range(1, 4):
         key = f'{operation}_{level}'
-        TASK_CONFIG[key] = {'name': f'{config["name"]} ({["простой", "средний", "сложный"][level - 1]})',
-                            'generate_func': getattr(ex, f'generate_{operation}_stage_{level}'),
-                            'check_func': ex.check_answer_for_all_stages,
-                            'points': config['points'][level - 1],
-                            'get_solution': lambda task, op=config['name']:
-                            [f'Просто {["сложим", "вычтем", "перемножим", "разделим"][["sum", "min", "mul", "crop"].index(operation)]} все коэффициенты',
-                             f'Ответ: {ex.answer_for_all_stages(task)}']}
+        TASK_CONFIG[key] = {
+            'name': f'{config["name"]} ({["простой", "средний", "сложный"][level - 1]})',
+            'generate_func': getattr(ex, f'generate_{operation}_stage_{level}'),
+            'check_func': ex.check_answer_for_all_stages,
+            'points': config['points'][level - 1],
+            'get_solution': lambda task, op=operation:
+            [f'Просто {["сложим", "вычтем", "перемножим", "разделим"][["sum", "min", "mul", "crop"].index(op)]} все коэффициенты',
+             f'Ответ: {ex.answer_for_all_stages(task)}']}
 
 
 def update_points(group_id, user_id, points):

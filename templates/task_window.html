@@ -1,29 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
+{% block content %}
 <head>
     <meta charset="UTF-8">
     <title>Выбор заданий</title>
 </head>
 <body>
-<a class="navbar-brand" href="/student_groups/{{ group.id }}/task/quadratic_equation">Квадратное уравнение</a>
-    <br />
-    <br />
-<a class="navbar-brand" href="/student_groups/{{ group.id }}/task/linear_equation">Линейное уравнение</a>
-    <br />
-    <br />
-<a class="navbar-brand" href="/student_groups/{{ group.id }}/task/sum">Пример на сложение</a>
-    <br />
-    <br />
-<a class="navbar-brand" href="/student_groups/{{ group.id }}/task/min">Пример на вычитание</a>
-    <br />
-    <br />
-<a class="navbar-brand" href="/student_groups/{{ group.id }}/task/mul">Пример на умножение</a>
-    <br />
-    <br />
-<a class="navbar-brand" href="/student_groups/{{ group.id }}/task/crop">Пример на деление</a>
-<br />
-<br />
-<br />
-<a class="navbar-brand" href="/student_groups/{{ group.id }}">Вернуться в группу</a>
+<nav>
+    <ul>
+        <a href="/student_groups/{{ group.id }}/task/quadratic_equation">Квадратное уравнение</a>
+        <a href="/student_groups/{{ group.id }}/task/linear_equation">Линейное уравнение</a>
+        <a href="/student_groups/{{ group.id }}/task/sum">Пример на сложение</a>
+        <a href="/student_groups/{{ group.id }}/task/min">Пример на вычитание</a>
+        <a href="/student_groups/{{ group.id }}/task/mul">Пример на умножение</a>
+        <a href="/student_groups/{{ group.id }}/task/crop">Пример на деление</a>
+    </ul>
+</nav>
+<nav>
+    <ul>
+        <a href="/student_groups/{{ group.id }}">Вернуться в группу</a>
+    </ul>
+</nav>
 </body>
-</html>
+{% endblock %}

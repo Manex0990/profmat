@@ -1,8 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>{{ group.name }}</h1>
-<li><a href="/student_groups/{{ group.id }}/task">Решать задачи</a></li>
+<nav>
+    <ul>
+        <li><a href="/student_groups/{{ group.id }}/task">Решать задачи</a></li>
 
+    </ul>
+</nav>
 <h2>Участники группы:</h2>
 <table>
     <thead>

@@ -1,9 +1,27 @@
 {% extends "base.html" %}
+
 {% block content %}
 <h2>Редактировать профиль</h2>
 <form method="post" enctype="multipart/form-data">
-  <label>Загрузить аватар:</label><br>
-  <input type="file" name="avatar"><br><br>
-  <button type="submit">Сохранить</button>
+    <h3>Загрузка аватара</h3>
+    <div class="file-upload" id="avatarUpload">
+        <input type="file" id="avatarInput" name="avatar" class="file-upload-input" accept=".jpg,.jpeg,.png,.gif">
+        <label for="avatarInput" class="file-upload-label">
+            🖼️ Выберите файл аватара
+        </label>
+    </div>
+
+    <center>
+        <div class="preview-container" id="previewContainer">
+            <img class="preview-image" id="previewImage" src="" alt="Превью аватара">
+            <div class="preview-info">
+                <div class="file-name" id="previewFileName">Файл не выбран</div>
+                <div class="file-size" id="previewFileSize"></div>
+            </div>
+        </div>
+    </center>
+    <center>
+        <button type="submit" class="btn-submit">Сохранить</button>
+    </center>
 </form>
 {% endblock %}

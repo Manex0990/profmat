@@ -313,34 +313,6 @@
             }
         }
 
-        /* Карточки */
-        .card {
-            background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #2d3748;
-            margin-bottom: 0.5rem;
-        }
-
-        .card-text {
-            color: #718096;
-            line-height: 1.6;
-        }
-
         /* Заголовки */
         h1, h2, h3, h4, h5, h6 {
             color: #2d3748;
@@ -369,42 +341,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-align: center;
-        }
-
-        /* Сообщения */
-        .alert {
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            margin-bottom: 1rem;
-            font-weight: 500;
-        }
-
-        .alert-success {
-            background: linear-gradient(135deg, #c6f6d5, #9ae6b4);
-            color: #22543d;
-            border: 1px solid #9ae6b4;
-        }
-
-        .alert-error {
-            background: linear-gradient(135deg, #fed7d7, #feb2b2);
-            color: #742a2a;
-            border: 1px solid #feb2b2;
-        }
-
-        .alert-info {
-            background: linear-gradient(135deg, #bee3f8, #90cdf4);
-            color: #1a365d;
-            border: 1px solid #90cdf4;
-        }
-
-        /* Футер */
-        footer {
-            background: rgba(255, 255, 255, 0.9);
-            text-align: center;
-            padding: 1.5rem;
-            margin-top: auto;
-            color: #718096;
-            font-weight: 500;
         }
 
         /* Адаптивность */
@@ -495,12 +431,14 @@
     <header>
         <nav>
             <ul>
-                {% if current_user.is_authenticated %}
+                {% if current_user.is_authenticated and title not in ['Квадратное уравнение', 'Линейное уравнение'] and
+                'Пример' not in title %}
                 <li><a href="/groups">Список групп</a></li>
                 <li><a href="/student_groups">Мои группы</a></li>
                 <li><a href="/profile">Профиль</a></li>
                 <li><a href="/logout">Выход</a></li>
-                {% else %}
+                {% elif not current_user.authenticated and title not in ['Квадратное уравнение', 'Линейное уравнение'] and
+                'Пример' not in title %}
                 <li><a href="/login">Войти</a></li>
                 <li><a href="/register">Зарегистрироваться</a></li>
                 {% endif %}

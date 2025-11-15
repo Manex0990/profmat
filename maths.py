@@ -22,9 +22,6 @@ class MyMath:
 
     def format_equation_term(self, coeff: int, variable: str = '', is_first: bool = False) -> str:
         """Форматирует коэффициент уравнения"""
-        if coeff == 0:
-            return ""
-
         sign = ""
         if not is_first:
             sign = " + " if coeff > 0 else " - "
@@ -132,18 +129,38 @@ class MyMath:
 
         return f"{left_side} = {c}"
 
-    def answer_linear_equation(self, line_x: str) -> str:
+    def get_coofs_linear_equation(self, task: str) -> int:
+        """Находит коэффициенты линейного уравнения"""
+        equation = task.replace(" ", "")
+
+        pattern = r'([+-]?\d*)x?([+-]\d+)?=([+-]?\d+)'
+
+        match = re.search(pattern, equation)
+
+        a_str, b_str, c_str = match.groups()
+
+        # Обработка коэффициента a
+        if a_str == "" or a_str == "+":
+            a = 1
+        elif a_str == "-":
+            a = -1
+        else:
+            a = int(a_str)
+
+        # Обработка коэффициента b
+        if b_str is None:
+            b = 0
+        else:
+            b = int(b_str)
+
+        # Обработка коэффициента c
+        c = int(c_str)
+
+        return [a, b, c]
+
+    def answer_linear_equation(self, linear_equation: str) -> str:
         """Находит корень линейного уравнения"""
-        # Упрощенная реализация - нужно доработать парсинг
-        parts = line_x.split()
-        a_str = parts[0].replace('x', '')
-        a = 1 if a_str == '' else -1 if a_str == '-' else int(a_str)
-
-        b_sign = 1 if parts[1] == '+' else -1
-        b = b_sign * int(parts[2])
-
-        c = int(parts[4])
-
+        a, b, c = self.get_coofs_linear_equation(linear_equation)
         x = (c - b) / a
         return str(int(x) if x.is_integer() else round(x, 2))
 

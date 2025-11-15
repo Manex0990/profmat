@@ -73,12 +73,13 @@ def handle_task_request(group_id, task_key, cookie_name, template_name='task_ope
         return redirect(url_for('student_groups'))
 
     config = TASK_CONFIG[task_key]
+    points = TASK_CONFIG[task_key]['points']
     task = str(request.cookies.get(cookie_name, config['generate_func']()))
     form = TaskForm()
 
     if request.method == 'GET':
         response = make_response(
-            render_template(template_name, title=config['name'], group=group, task=task, form=form))
+            render_template(template_name, title=config['name'], group=group, task=task, form=form, points=points))
         response.set_cookie(cookie_name, value=str(task), max_age=60 * 60 * 24 * 365 * 2)
         return response
 
@@ -96,7 +97,7 @@ def handle_task_request(group_id, task_key, cookie_name, template_name='task_ope
 
     response = make_response(render_template(template_name, title=config['name'], group=group, task=task,
                                              form=form, solution_log=solution_log, message=verdict[0],
-                                             message_type=message_type))
+                                             message_type=message_type, points=points))
 
     if verdict[1]:
         response.set_cookie(cookie_name, '', max_age=0)

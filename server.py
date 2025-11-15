@@ -381,10 +381,6 @@ def view_student_group(group_id):
 @app.route('/groups')
 @login_required
 def view_groups():
-    if not current_user.teacher:
-        return render_template('student_groups.html',
-                               line='Вы не учитель, у вас нет ваших групп. Перейдите в раздел Мои группы.')
-
     db_sess = db_session.create_session()
     try:
         teacher_memberships = db_sess.query(GroupMember).filter_by(user_id=current_user.id, is_teacher=True).all()

@@ -2,10 +2,16 @@
 
 {% block content %}
 <h1>Мои группы</h1>
-<ul>
-    {% for group in groups %}
-    <li><a href="/group/{{ group.id }}">{{ group.name }}</a></li>
-    {% endfor %}
-</ul>
-<a href="/group/create">Создать новую группу</a>
+<nav>
+    <ul>
+        {% for group in groups %}
+        <a href="/group/{{ group.id }}">{{ group.name }}</a>
+        {% endfor %}
+    </ul>
+</nav>
+<nav>
+    <ul>
+        <a href="/group/create">Создать новую группу</a>
+    </ul>
+</nav>
 {% endblock %}

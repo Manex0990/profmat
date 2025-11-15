@@ -433,14 +433,24 @@
             <ul>
                 {% if current_user.is_authenticated and title not in ['Квадратное уравнение', 'Линейное уравнение'] and
                 'Пример' not in title %}
+                <body>
+                {% if current_user.teacher %}
+                <body>
                 <li><a href="/groups">Список групп</a></li>
+                </body>
+                {% else %}
+                <body>
                 <li><a href="/student_groups">Мои группы</a></li>
+                </body>
+                {% endif %}
                 <li><a href="/profile">Профиль</a></li>
                 <li><a href="/logout">Выход</a></li>
-                {% elif not current_user.authenticated and title not in ['Квадратное уравнение', 'Линейное уравнение'] and
+                {% elif not current_user.authenticated and title not in ['Квадратное уравнение', 'Линейное уравнение']
+                and
                 'Пример' not in title %}
                 <li><a href="/login">Войти</a></li>
                 <li><a href="/register">Зарегистрироваться</a></li>
+                </body>
                 {% endif %}
             </ul>
         </nav>

@@ -9,11 +9,19 @@ class MyMath:
                           '-': 'm',
                           '*': 'mul',
                           ':': 'cr'}
+        self.equation_types = {
+            'quadratic': {'patterns': [(r'([+-]?\d*)x²', 'a'),  # x²
+                                      (r'([+-]?\d*)x(?!²)', 'b'),  # x
+                                      (r'([+-]?\d+)(?!.*x)', 'c')],
+                         'format_terms': ['x²', 'x', '']},
+            'biquadratic': {'patterns': [(r'([+-]?\d*)x⁴', 'a'),  # x⁴
+                                         (r'([+-]?\d*)x²(?!⁴)', 'b'),  # x²
+                                         (r'([+-]?\d+)(?!.*x)', 'c')], 'format_terms': ['x⁴', 'x²', '']}}
 
     def generate_random_numbers(self):
         a, b, c = 0, 0, 0
         while a == 0:
-            a = randint(-9, 9)
+            a = randint(0, 9)
         while b == 0:
             b = randint(-9, 9)
         while c == 0:
@@ -36,89 +44,127 @@ class MyMath:
         else:
             return f"{sign}{abs_coeff}" if not is_first else str(abs_coeff)
 
-    def generate_quadratic_equation(self) -> str:
-        """Генерирует квадратное уравнение в строковом формате"""
+    def generate_equation(self, eq_type: str) -> str:
+        """Генерирует уравнение заданного типа"""
+        if eq_type not in self.equation_types:
+            raise ValueError(f"Неопознанный тип уравнения: {eq_type}")
         a, b, c = self.generate_random_numbers()
-
-        # Формируем уравнение
-        equation = self.format_equation_term(a, 'x²', True)
-        equation += self.format_equation_term(b, 'x')
-        equation += self.format_equation_term(c)
-
+        terms = self.equation_types[eq_type]['format_terms']
+        equation = self.format_equation_term(a, terms[0], True)
+        equation += self.format_equation_term(b, terms[1])
+        equation += self.format_equation_term(c, terms[2])
         return f"{equation} = 0"
 
-    def find_coofs_quadratic_equation(self, quadratic_equation: str) -> List[int]:
-        a = b = c = 0
+    def generate_quadratic_equation(self) -> str:
+        return self.generate_equation('quadratic')
 
+    def generate_biquadratic_equation(self) -> str:
+        return self.generate_equation('biquadratic')
+
+    def find_coefficients(self, equation: str, eq_type: str) -> List[int]:
+        """Находит коэффициенты уравнения"""
+        if eq_type not in self.equation_types:
+            raise ValueError(f"Unknown equation type: {eq_type}")
         # Убираем пробелы и "= 0"
-        equation = quadratic_equation.replace(' ', '').replace('=0', '')
+        clean_eq = equation.replace(' ', '').replace('=0', '')
+        coefficients = {'a': 0, 'b': 0, 'c': 0}
+        for pattern, coeff_name in self.equation_types[eq_type]['patterns']:
+            match = re.search(pattern, clean_eq)
+            if match:
+                coeff_str = match.group(1)
+                if not coeff_str or coeff_str == '+':
+                    coefficients[coeff_name] = 1
+                elif coeff_str == '-':
+                    coefficients[coeff_name] = -1
+                else:
+                    coefficients[coeff_name] = int(coeff_str)
+        return [coefficients['a'], coefficients['b'], coefficients['c']]
 
-        # Шаблоны для поиска
-        x2_pattern = r'([+-]?\d*)x²'  # x²
-        x_pattern = r'([+-]?\d*)x(?!²)'  # x
-        const_pattern = r'([+-]?\d+)(?!.*x)'
+    def find_coofs_quadratic_equation(self, equation: str) -> List[int]:
+        return self.find_coefficients(equation, 'quadratic')
 
-        # Ищем коэффициент перед x²
-        x2_match = re.search(x2_pattern, equation)
-        if x2_match:
-            coeff = x2_match.group(1)
-            if not coeff or coeff == '+':
-                a = 1
-            elif coeff == '-':
-                a = -1
-            else:
-                a = int(coeff)
+    def find_coofs_biquadratic_equation(self, equation: str) -> List[int]:
+        return self.find_coefficients(equation, 'biquadratic')
 
-        # Ищем коэффициент перед x
-        x_match = re.search(x_pattern, equation)
-        if x_match:
-            coeff = x_match.group(1)
-            if not coeff or coeff == '+':
-                b = 1
-            elif coeff == '-':
-                b = -1
-            else:
-                b = int(coeff)
-
-        # Ищем свободный член кв. ур.
-        const_match = re.search(const_pattern, equation)
-        if const_match:
-            c = int(const_match.group(1))
-
-        return [a, b, c]
+    def calculate_discriminant(self, a: int, b: int, c: int) -> float:
+        """Вычисляет дискриминант"""
+        return b ** 2 - 4 * a * c
 
     def find_discriminant(self, quadratic_equation: str) -> float:
-        """Вычисляет дискриминант квадратного уравнения"""
         a, b, c = self.find_coofs_quadratic_equation(quadratic_equation)
-        return b ** 2 - 4 * a * c
+        return self.calculate_discriminant(a, b, c)
+
+    def find_discriminant_biquadratic(self, biquadratic_equation: str) -> float:
+        a, b, c = self.find_coofs_biquadratic_equation(biquadratic_equation)
+        return self.calculate_discriminant(a, b, c)
+
+    def process_root(self, root: float) -> float:
+        """Обрабатывает и округляет корень"""
+        return int(root) if root.is_integer() else round(root, 2)
+
+    def solve_quadratic_equation(self, a: int, b: int, c: int) -> List[float]:
+        """Решает квадратное уравнение и возвращает корни"""
+        d = self.calculate_discriminant(a, b, c)
+        if d < 0:
+            return []
+        elif d == 0:
+            return [self.process_root(-b / (2 * a))]
+        else:
+            roots = [
+                (-b - d ** 0.5) / (2 * a),
+                (-b + d ** 0.5) / (2 * a)
+            ]
+            return sorted([self.process_root(r) for r in roots])
 
     def answer_quadratic_equation(self, quadratic_equation: str) -> str:
         """Находит корни квадратного уравнения"""
         a, b, c = self.find_coofs_quadratic_equation(quadratic_equation)
-        d = self.find_discriminant(quadratic_equation)
+        roots = self.solve_quadratic_equation(a, b, c)
+        return "Корней нет" if not roots else ' '.join(str(x) for x in roots)
 
-        if d < 0:
+    def answer_biquadratic_equation(self, biquadratic_equation: str) -> str:
+        """Находит корни биквадратного уравнения"""
+        a, b, c = self.find_coofs_biquadratic_equation(biquadratic_equation)
+        # Решаем относительно y = x²
+        y_roots = self.solve_quadratic_equation(a, b, c)
+        if not y_roots:
             return "Корней нет"
-        elif d == 0:
-            x = -b / (2 * a)
-            return str(int(x) if x.is_integer() else round(x, 2))
+        # Извлекаем корни из неотрицательных значений y
+        final_roots = []
+        for y in y_roots:
+            if y > 0:
+                sqrt_y = y ** 0.5
+                final_roots.extend([-sqrt_y, sqrt_y])
+            elif y == 0:
+                final_roots.append(0.0)
+        if not final_roots:
+            return "Корней нет"
+        processed_roots = []
+        for root in final_roots:
+            processed_root = self.process_root(root)
+            if processed_root not in processed_roots:
+                processed_roots.append(processed_root)
+        processed_roots.sort()
+        return ' '.join(str(x) for x in processed_roots)
+
+    def check_answer(self, task: str, user_answer: str, eq_type: str) -> List:
+        """Проверяет ответ для уравнения"""
+        if eq_type == 'quadratic':
+            correct_answer = self.answer_quadratic_equation(task)
+        elif eq_type == 'biquadratic':
+            correct_answer = self.answer_biquadratic_equation(task)
         else:
-            x1 = (-b - d ** 0.5) / (2 * a)
-            x2 = (-b + d ** 0.5) / (2 * a)
-
-            x1 = int(x1) if x1.is_integer() else round(x1, 2)
-            x2 = int(x2) if x2.is_integer() else round(x2, 2)
-
-            answers = sorted([x1, x2])
-            return ' '.join(str(x) for x in answers)
+            raise ValueError(f"Неопознанный тип уравнения: {eq_type}")
+        is_correct = str(user_answer).strip() == correct_answer
+        message = ("Верно. Продолжайте в том же духе." if is_correct
+                   else "Неверно. Проверьте расчёты и попробуйте еще раз.")
+        return [message, is_correct, eq_type]
 
     def check_answer_quadratic_equation(self, task: str, user_answer: str) -> List:
-        """Проверяет ответ для квадратного уравнения"""
-        correct_answer = self.answer_quadratic_equation(task)
-        is_correct = str(user_answer).strip() == correct_answer
+        return self.check_answer(task, user_answer, 'quadratic')
 
-        message = "Верно. Продолжайте в том же духе." if is_correct else "Неверно. Проверьте расчёты и попробуйте еще раз."
-        return [message, is_correct, 'square_x']
+    def check_answer_biquadratic_equation(self, task: str, user_answer: str) -> List:
+        return self.check_answer(task, user_answer, 'biquadratic')
 
     def generate_linear_equation(self) -> str:
         """Генерирует линейное уравнение"""

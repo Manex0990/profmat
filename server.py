@@ -73,7 +73,7 @@ def handle_task_request(group_id, task_key, cookie_name, template_name='task_ope
         return redirect(url_for('student_groups'))
 
     config = TASK_CONFIG[task_key]
-    points = TASK_CONFIG[task_key]['points']
+    points = config['points']
     task = str(request.cookies.get(cookie_name, config['generate_func']()))
     form = TaskForm()
 
@@ -106,6 +106,12 @@ def handle_task_request(group_id, task_key, cookie_name, template_name='task_ope
 
 
 # Упрощенные маршруты
+@app.route('/student_groups/<int:group_id>/task/biquadratic_equation', methods=['GET', 'POST'])
+@login_required
+def open_task_biquadratic(group_id):
+    return handle_task_request(group_id, 'biquadratic_equation', 'cur_task_biquadratic_equation')
+
+
 @app.route('/student_groups/<int:group_id>/task/quadratic_equation', methods=['GET', 'POST'])
 @login_required
 def open_task_square(group_id):
@@ -144,6 +150,7 @@ def open_task_menu(group_id):
             flash("Вы не состоите в этой группе!", "error")
             return redirect(url_for('student_groups'))
         res = make_response(render_template('task_window.html', group=group))
+        res.set_cookie('cur_task_biquadratic_equation', '', max_age=0)
         res.set_cookie('cur_task_quadratic_equation', '', max_age=0)
         res.set_cookie('cur_task_linear_equation', '', max_age=0)
         return res

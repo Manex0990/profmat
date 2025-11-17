@@ -46,8 +46,6 @@ class MyMath:
 
     def generate_equation(self, eq_type: str) -> str:
         """Генерирует уравнение заданного типа"""
-        if eq_type not in self.equation_types:
-            raise ValueError(f"Неопознанный тип уравнения: {eq_type}")
         a, b, c = self.generate_random_numbers()
         terms = self.equation_types[eq_type]['format_terms']
         equation = self.format_equation_term(a, terms[0], True)
@@ -63,8 +61,6 @@ class MyMath:
 
     def find_coefficients(self, equation: str, eq_type: str) -> List[int]:
         """Находит коэффициенты уравнения"""
-        if eq_type not in self.equation_types:
-            raise ValueError(f"Unknown equation type: {eq_type}")
         # Убираем пробелы и "= 0"
         clean_eq = equation.replace(' ', '').replace('=0', '')
         coefficients = {'a': 0, 'b': 0, 'c': 0}
@@ -151,10 +147,8 @@ class MyMath:
         """Проверяет ответ для уравнения"""
         if eq_type == 'quadratic':
             correct_answer = self.answer_quadratic_equation(task)
-        elif eq_type == 'biquadratic':
-            correct_answer = self.answer_biquadratic_equation(task)
         else:
-            raise ValueError(f"Неопознанный тип уравнения: {eq_type}")
+            correct_answer = self.answer_biquadratic_equation(task)
         is_correct = str(user_answer).strip() == correct_answer
         message = ("Верно. Продолжайте в том же духе." if is_correct
                    else "Неверно. Проверьте расчёты и попробуйте еще раз.")
@@ -220,7 +214,7 @@ class MyMath:
         is_correct = str(user_ans).strip() == correct_ans
 
         message = "Верно. Продолжайте в том же духе." if is_correct else "Неверно. Проверьте расчеты и попробуйте позже."
-        return [message, is_correct, 'line_x']
+        return [message, is_correct, 'linear_equation']
 
     def parse_numbers(self, task: str) -> List[float]:
         """Парсит числа из строки задачи"""

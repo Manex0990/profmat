@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="fix animations">
+    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="fixes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maths.py" beforeDir="false" afterPath="$PROJECT_DIR$/maths.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/web.db" beforeDir="false" afterPath="$PROJECT_DIR$/db/web.db" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,7 +64,7 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
 }</component>
-  <component name="RunManager" selected="Python.maths">
+  <component name="RunManager" selected="Python.server">
     <configuration name="30" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="profmat" />
       <option name="ENV_FILES" value="" />
@@ -155,8 +155,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.maths" />
         <item itemvalue="Python.server" />
+        <item itemvalue="Python.maths" />
         <item itemvalue="Python.30" />
       </list>
     </recent_temporary>
@@ -336,7 +336,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763406815086</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="fixes">
+      <option name="closed" value="true" />
+      <created>1763409353753</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1763409353753</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -366,8 +374,8 @@
     <MESSAGE value="all working css" />
     <MESSAGE value="end old project and start to adding news" />
     <MESSAGE value="add biquadratic equations" />
-    <MESSAGE value="fixes" />
     <MESSAGE value="fix animations" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix animations" />
+    <MESSAGE value="fixes" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixes" />
   </component>
 </project>

@@ -1,31 +1,29 @@
-from random import randint, uniform
+import functools
+from random import randint, uniform, choice
 from typing import List, Tuple
+import itertools
 import re
 
 
 class MyMath:
     def __init__(self):
-        self.OPERATORS = {'+': 's',
-                          '-': 'm',
-                          '*': 'mul',
-                          ':': 'cr'}
         self.equation_types = {
             'quadratic': {'patterns': [(r'([+-]?\d*)x²', 'a'),  # x²
-                                      (r'([+-]?\d*)x(?!²)', 'b'),  # x
-                                      (r'([+-]?\d+)(?!.*x)', 'c')],
-                         'format_terms': ['x²', 'x', '']},
+                                       (r'([+-]?\d*)x(?!²)', 'b'),  # x
+                                       (r'([+-]?\d+)(?!.*x)', 'c')],
+                          'format_terms': ['x²', 'x', '']},
             'biquadratic': {'patterns': [(r'([+-]?\d*)x⁴', 'a'),  # x⁴
                                          (r'([+-]?\d*)x²(?!⁴)', 'b'),  # x²
                                          (r'([+-]?\d+)(?!.*x)', 'c')], 'format_terms': ['x⁴', 'x²', '']}}
+        self.OPERATIONS = {'s': sum,
+                           'm': lambda nums: nums[0] - sum(nums[1:]),
+                           'mul': lambda nums: self.product(nums),
+                           'cr': lambda nums: self.divide_sequence(nums)}
 
     def generate_random_numbers(self):
-        a, b, c = 0, 0, 0
-        while a == 0:
-            a = randint(0, 9)
-        while b == 0:
-            b = randint(-9, 9)
-        while c == 0:
-            c = randint(-9, 9)
+        a = randint(1, 9)
+        b = choice(list(itertools.chain(range(-9, 0), range(1, 10))))  # случайное целое число от -9 до 9, не включая 0
+        c = choice(list(itertools.chain(range(-9, 0), range(1, 10))))  # случайное целое число от -9 до 9, не включая 0
         return a, b, c
 
     def format_equation_term(self, coeff: int, variable: str = '', is_first: bool = False) -> str:
@@ -169,7 +167,7 @@ class MyMath:
 
         return f"{left_side} = {c}"
 
-    def get_coofs_linear_equation(self, task: str) -> int:
+    def get_coofs_linear_equation(self, task: str) -> List[int]:
         """Находит коэффициенты линейного уравнения"""
         equation = task.replace(" ", "")
 
@@ -218,7 +216,6 @@ class MyMath:
 
     def parse_numbers(self, task: str) -> List[float]:
         """Парсит числа из строки задачи"""
-        import re
         numbers = re.findall(r'-?\d+\.?\d*', task)
         return [float(num) for num in numbers]
 
@@ -245,12 +242,7 @@ class MyMath:
         task_type, stage = self.identify_task_type(task)
         numbers = self.parse_numbers(task)
 
-        operations = {'s': sum,
-                      'm': lambda nums: nums[0] - sum(nums[1:]),
-                      'mul': lambda nums: self.product(nums),
-                      'cr': lambda nums: self.divide_sequence(nums)}
-
-        result = operations[task_type](numbers)
+        result = self.OPERATIONS[task_type](numbers)
 
         # Форматирование результата
         if stage == 1 and task_type in ['s', 'm', 'mul']:
@@ -264,16 +256,12 @@ class MyMath:
 
     def product(self, numbers: List[float]) -> float:
         """Вычисляет произведение чисел"""
-        result = 1
-        for num in numbers:
-            result *= num
+        result = functools.reduce(lambda x, y: x * y, numbers)
         return result
 
     def divide_sequence(self, numbers: List[float]) -> float:
         """Вычисляет последовательное деление"""
-        result = numbers[0]
-        for num in numbers[1:]:
-            result /= num
+        result = functools.reduce(lambda x, y: x / y, numbers)
         return result
 
     def check_answer_for_all_stages(self, task: str, user_answer: str) -> List:

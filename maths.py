@@ -18,7 +18,8 @@ class MyMath:
             'irrational': {'patterns': [(r'√\W([+-]?\d*)x', 'a'),  # x под корнем
                                         (r'([+-]?\d+)[^x]\W', 'b'),  # свободный член под корнем
                                         (r'[^√]\W([+-]?\d*)x', 'c'),  # x
-                                        (r'([+-]?\d*)(?!.*x)', 'd')], 'format_terms': ['x', '', 'x', '']}, }  # свободный член
+                                        (r'([+-]?\d*)(?!.*x)', 'd')],
+                           'format_terms': ['x', '', 'x', '']}, }  # свободный член
         self.OPERATIONS = {'s': sum,
                            'm': lambda nums: nums[0] - sum(nums[1:]),
                            'mul': lambda nums: self.product(nums),
@@ -47,9 +48,12 @@ class MyMath:
         else:
             return f"{sign}{abs_coeff}" if not is_first else str(abs_coeff)
 
-    def generate_equation(self, eq_type: str) -> str:
+    def generate_equation(self, eq_type: str, use_not_random_coofs=None) -> str:
         """Генерирует уравнение заданного типа"""
-        a, b, c, d = self.generate_random_numbers()
+        if not use_not_random_coofs:
+            a, b, c, d = self.generate_random_numbers()
+        else:
+            a, b, c = use_not_random_coofs
         terms = self.equation_types[eq_type]['format_terms']
         equation = self.format_equation_term(a, terms[0], True)
         equation += self.format_equation_term(b, terms[1])
@@ -159,13 +163,41 @@ class MyMath:
         processed_roots.sort()
         return ' '.join(str(x) for x in processed_roots)
 
+    def check_the_equation_definition(self, definition: int, route: int) -> bool:
+        """Проверяет, входят ли корни в область определения уравнения"""
+        if route >= definition:
+            return True
+        return False
+
+    def answer_irrational_equation(self, irrational_equation: str) -> str:
+        """Находит корни биквадратного уравнения"""
+        a, b, c, d = self.find_coofs_irrational_equation(irrational_equation)
+
+        # создаем вспомогательное уравнение и находим его корни
+        a_new, b_new, c_new = c ** 2, (c * d * 2) - a, (d ** 2) - b
+        temp_eq = self.generate_equation('quadratic', [a_new, b_new, c_new])
+        routes = self.answer_quadratic_equation(temp_eq)
+        if routes == 'Корней нет':
+            return 'Корней нет'
+
+        # проверяем корни по области определения
+        ans = []
+        eq_definition = -d / c
+        for route in list(map(float, routes.split())):
+            if self.check_the_equation_definition(eq_definition, route):
+                ans.append(str(route))
+        return ' '.join(ans)
+
     def check_answer(self, task: str, user_answer: str, eq_type: str) -> List:
         """Проверяет ответ для уравнения"""
         if eq_type == 'quadratic':
-            correct_answer = self.answer_quadratic_equation(task)
+            correct_answer = self.answer_quadratic_equation(task).rstrip('.0')
+        elif eq_type == 'biquadratic':
+            correct_answer = self.answer_biquadratic_equation(task).rstrip('.0')
         else:
-            correct_answer = self.answer_biquadratic_equation(task)
-        is_correct = str(user_answer).strip() == correct_answer
+            correct_answer = self.answer_irrational_equation(task).rstrip('.0')
+        user_ans = str(user_answer).strip().rstrip('.0')
+        is_correct = str(user_ans).strip() == correct_answer
         message = ("Верно. Продолжайте в том же духе." if is_correct
                    else "Неверно. Проверьте расчёты и попробуйте еще раз.")
         return [message, is_correct, eq_type]
@@ -175,6 +207,9 @@ class MyMath:
 
     def check_answer_biquadratic_equation(self, task: str, user_answer: str) -> List:
         return self.check_answer(task, user_answer, 'biquadratic')
+
+    def check_answer_irrational_equation(self, task: str, user_answer: str) -> List:
+        return self.check_answer(task, user_answer, 'irrational')
 
     def generate_linear_equation(self) -> str:
         """Генерирует линейное уравнение"""

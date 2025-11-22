@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="little optimization">
+    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="add generate and find coofs iirational equation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/math_api.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/db/web.db" beforeDir="false" afterPath="$PROJECT_DIR$/db/web.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/maths.py" beforeDir="false" afterPath="$PROJECT_DIR$/maths.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -158,8 +156,8 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.maths" />
-        <item itemvalue="Python.server" />
         <item itemvalue="Python.30" />
+        <item itemvalue="Python.server" />
       </list>
     </recent_temporary>
   </component>
@@ -370,7 +368,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763670239196</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="add generate and find coofs iirational equation">
+      <option name="closed" value="true" />
+      <created>1763804905680</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1763804905680</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -405,6 +411,7 @@
     <MESSAGE value="table design" />
     <MESSAGE value="readme" />
     <MESSAGE value="little optimization" />
-    <option name="LAST_COMMIT_MESSAGE" value="little optimization" />
+    <MESSAGE value="add generate and find coofs iirational equation" />
+    <option name="LAST_COMMIT_MESSAGE" value="add generate and find coofs iirational equation" />
   </component>
 </project>

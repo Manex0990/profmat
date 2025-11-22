@@ -28,8 +28,8 @@ class MyMath:
     def generate_random_numbers(self):
         a = randint(1, 9)
         b = choice(list(itertools.chain(range(-9, 0), range(1, 10))))  # случайное целое число от -9 до 9, не включая 0
-        c = choice(list(itertools.chain(range(-9, 0), range(1, 10))))  # случайное целое число от -9 до 9, не включая 0
-        d = choice(list(itertools.chain(range(-9, 0), range(1, 10))))  # случайное целое число от -9 до 9, не включая 0
+        c = choice(list(itertools.chain(range(-9, 0), range(1, 8))))  # случайное целое число от -9 до 7, не включая 0
+        d = choice(list(itertools.chain(range(-9, 0), range(1, 8))))  # случайное целое число от -9 до 7, не включая 0
         return a, b, c, d
 
     def format_equation_term(self, coeff: int, variable: str = '', is_first: bool = False) -> str:

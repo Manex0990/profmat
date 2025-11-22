@@ -14,7 +14,11 @@ class MyMath:
                           'format_terms': ['x²', 'x', '']},
             'biquadratic': {'patterns': [(r'([+-]?\d*)x⁴', 'a'),  # x⁴
                                          (r'([+-]?\d*)x²(?!⁴)', 'b'),  # x²
-                                         (r'([+-]?\d+)(?!.*x)', 'c')], 'format_terms': ['x⁴', 'x²', '']}}
+                                         (r'([+-]?\d+)(?!.*x)', 'c')], 'format_terms': ['x⁴', 'x²', '']},
+            'irrational': {'patterns': [(r'√\W([+-]?\d*)x', 'a'),  # x под корнем
+                                        (r'([+-]?\d+)[^x]\W', 'b'),  # свободный член под корнем
+                                        (r'[^√]\W([+-]?\d*)x', 'c'),  # x
+                                        (r'([+-]?\d*)(?!.*x)', 'd')], 'format_terms': ['x', '', 'x', '']}, }  # свободный член
         self.OPERATIONS = {'s': sum,
                            'm': lambda nums: nums[0] - sum(nums[1:]),
                            'mul': lambda nums: self.product(nums),
@@ -24,7 +28,8 @@ class MyMath:
         a = randint(1, 9)
         b = choice(list(itertools.chain(range(-9, 0), range(1, 10))))  # случайное целое число от -9 до 9, не включая 0
         c = choice(list(itertools.chain(range(-9, 0), range(1, 10))))  # случайное целое число от -9 до 9, не включая 0
-        return a, b, c
+        d = choice(list(itertools.chain(range(-9, 0), range(1, 10))))  # случайное целое число от -9 до 9, не включая 0
+        return a, b, c, d
 
     def format_equation_term(self, coeff: int, variable: str = '', is_first: bool = False) -> str:
         """Форматирует коэффициент уравнения"""
@@ -44,7 +49,7 @@ class MyMath:
 
     def generate_equation(self, eq_type: str) -> str:
         """Генерирует уравнение заданного типа"""
-        a, b, c = self.generate_random_numbers()
+        a, b, c, d = self.generate_random_numbers()
         terms = self.equation_types[eq_type]['format_terms']
         equation = self.format_equation_term(a, terms[0], True)
         equation += self.format_equation_term(b, terms[1])
@@ -57,11 +62,20 @@ class MyMath:
     def generate_biquadratic_equation(self) -> str:
         return self.generate_equation('biquadratic')
 
+    def generate_irrational_equation(self) -> str:
+        a, b, c, d = self.generate_random_numbers()
+        terms = self.equation_types['irrational']['format_terms']
+        left_side = self.format_equation_term(a, terms[0], True)
+        left_side += self.format_equation_term(b, terms[1])
+        right_side = self.format_equation_term(c, terms[2], True)
+        right_side += self.format_equation_term(d, terms[3])
+        return f'√({left_side}) = {right_side}'
+
     def find_coefficients(self, equation: str, eq_type: str) -> List[int]:
         """Находит коэффициенты уравнения"""
         # Убираем пробелы и "= 0"
         clean_eq = equation.replace(' ', '').replace('=0', '')
-        coefficients = {'a': 0, 'b': 0, 'c': 0}
+        coefficients = {'a': 0, 'b': 0, 'c': 0, 'd': 0}
         for pattern, coeff_name in self.equation_types[eq_type]['patterns']:
             match = re.search(pattern, clean_eq)
             if match:
@@ -72,13 +86,17 @@ class MyMath:
                     coefficients[coeff_name] = -1
                 else:
                     coefficients[coeff_name] = int(coeff_str)
-        return [coefficients['a'], coefficients['b'], coefficients['c']]
+        return [coefficients['a'], coefficients['b'], coefficients['c']] if eq_type != 'irrational' else [
+            coefficients['a'], coefficients['b'], coefficients['c'], coefficients['d']]
 
     def find_coofs_quadratic_equation(self, equation: str) -> List[int]:
         return self.find_coefficients(equation, 'quadratic')
 
     def find_coofs_biquadratic_equation(self, equation: str) -> List[int]:
         return self.find_coefficients(equation, 'biquadratic')
+
+    def find_coofs_irrational_equation(self, equation: str) -> List[int]:
+        return self.find_coefficients(equation, 'irrational')
 
     def calculate_discriminant(self, a: int, b: int, c: int) -> float:
         """Вычисляет дискриминант"""
@@ -160,7 +178,7 @@ class MyMath:
 
     def generate_linear_equation(self) -> str:
         """Генерирует линейное уравнение"""
-        a, b, c = self.generate_random_numbers()
+        a, b, c, d = self.generate_random_numbers()
 
         left_side = self.format_equation_term(a, 'x', True)
         left_side += self.format_equation_term(b)

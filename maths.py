@@ -1,4 +1,5 @@
 import functools
+import math
 from random import randint, uniform, choice
 from typing import List, Tuple
 import itertools
@@ -26,27 +27,29 @@ class MyMath:
                            'cr': lambda nums: self.divide_sequence(nums)}
 
     def generate_random_numbers(self):
-        a = randint(1, 9)
-        b = choice(list(itertools.chain(range(-9, 0), range(1, 10))))  # случайное целое число от -9 до 9, не включая 0
-        c = choice(list(itertools.chain(range(-9, 0), range(1, 8))))  # случайное целое число от -9 до 7, не включая 0
-        d = choice(list(itertools.chain(range(-9, 0), range(1, 8))))  # случайное целое число от -9 до 7, не включая 0
+        nums_range = list(itertools.chain(range(-9, 0), range(1, 10)))  # диапазон целых чисел от -9 до 9, не включая 0
+        a = choice(nums_range)
+        b = choice(nums_range)
+        c = choice(nums_range)
+        d = choice(nums_range)
         return a, b, c, d
 
     def format_equation_term(self, coeff: int, variable: str = '', is_first: bool = False) -> str:
         """Форматирует коэффициент уравнения"""
-        sign = ""
         if not is_first:
             sign = " + " if coeff > 0 else " - "
+        else:
+            sign = '' if coeff > 0 else '-'
 
         abs_coeff = abs(coeff)
 
         if variable:
             if abs_coeff == 1:
-                return f"{sign}{variable}" if not is_first else variable
+                return f"{sign}{variable}"
             else:
-                return f"{sign}{abs_coeff}{variable}" if not is_first else f"{abs_coeff}{variable}"
+                return f"{sign}{abs_coeff}{variable}"
         else:
-            return f"{sign}{abs_coeff}" if not is_first else str(abs_coeff)
+            return f"{sign}{abs_coeff}"
 
     def generate_equation(self, eq_type: str, use_not_random_coofs=None) -> str:
         """Генерирует уравнение заданного типа"""
@@ -116,7 +119,7 @@ class MyMath:
 
     def process_root(self, root: float) -> float:
         """Обрабатывает и округляет корень"""
-        return int(root) if root.is_integer() else round(root, 2)
+        return int(root) if root.is_integer() else float(root) if math.isfinite(root) else round(root, 2)
 
     def solve_quadratic_equation(self, a: int, b: int, c: int) -> List[float]:
         """Решает квадратное уравнение и возвращает корни"""
@@ -136,7 +139,10 @@ class MyMath:
         """Находит корни квадратного уравнения"""
         a, b, c = self.find_coofs_quadratic_equation(quadratic_equation)
         roots = self.solve_quadratic_equation(a, b, c)
-        return "Корней нет" if not roots else ' '.join(str(x) for x in roots)
+        if not roots:
+            return "Корней нет"
+        return ' '.join(
+            str(int(x)) if x.is_integer() else str(round(x, 2)) if len(str(x)) > 10 else str(x) for x in roots)
 
     def answer_biquadratic_equation(self, biquadratic_equation: str) -> str:
         """Находит корни биквадратного уравнения"""
@@ -161,13 +167,9 @@ class MyMath:
             if processed_root not in processed_roots:
                 processed_roots.append(processed_root)
         processed_roots.sort()
-        return ' '.join(str(x) for x in processed_roots)
-
-    def check_the_equation_definition(self, definition: int, route: int) -> bool:
-        """Проверяет, входят ли корни в область определения уравнения"""
-        if route >= definition:
-            return True
-        return False
+        return ' '.join(
+            str(int(x)) if x.is_integer() else str(round(x, 2)) if len(str(x)) > 10 else str(x) for x in
+            processed_roots)
 
     def answer_irrational_equation(self, irrational_equation: str) -> str:
         """Находит корни биквадратного уравнения"""
@@ -176,17 +178,18 @@ class MyMath:
         # создаем вспомогательное уравнение и находим его корни
         a_new, b_new, c_new = c ** 2, (c * d * 2) - a, (d ** 2) - b
         temp_eq = self.generate_equation('quadratic', [a_new, b_new, c_new])
-        routes = self.answer_quadratic_equation(temp_eq)
-        if routes == 'Корней нет':
+        routs = self.answer_quadratic_equation(temp_eq)
+        if routs == 'Корней нет':
             return 'Корней нет'
 
         # проверяем корни по области определения
         ans = []
         eq_definition = -d / c
-        for route in list(map(float, routes.split())):
-            if self.check_the_equation_definition(eq_definition, route):
+        for route in list(map(float, routs.split())):
+            if (c > 0 and route >= eq_definition) or (c < 0 and route <= eq_definition):
                 ans.append(str(route))
-        return ' '.join(ans)
+        return ' '.join(
+            str(int(x)) if x.is_integer() else str(round(x, 2)) if len(str(x)) > 10 else str(x) for x in list(map(float, ans))) if ans else 'Корней нет'
 
     def check_answer(self, task: str, user_answer: str, eq_type: str) -> List:
         """Проверяет ответ для уравнения"""
@@ -253,7 +256,7 @@ class MyMath:
         """Находит корень линейного уравнения"""
         a, b, c = self.get_coofs_linear_equation(linear_equation)
         x = (c - b) / a
-        return str(int(x) if x.is_integer() else round(x, 2))
+        return str(int(x) if x.is_integer() else round(x, 2) if len(str(x)) > 10 else x)
 
     def check_answer_linear_equation(self, task: str, user_answer: str) -> List:
         """Проверяет ответ для линейного уравнения"""
@@ -288,7 +291,7 @@ class MyMath:
             if op in task:
                 return code, stage
 
-        return 's', 1  # fallback
+        return 's', 1
 
     def answer_for_all_stages(self, task: str) -> str:
         """Находит решение для любого примера"""
@@ -299,11 +302,12 @@ class MyMath:
 
         # Форматирование результата
         if stage == 1 and task_type in ['s', 'm', 'mul']:
-            result = int(round(result))
+            result = int(round(result, 2))
         else:
-            result = round(result, 2)
             if result.is_integer():
                 result = int(result)
+            elif len(str(result)) > 10:
+                result = round(result, 2)
 
         return str(result)
 
@@ -394,3 +398,18 @@ class MyMath:
 
     def generate_crop_stage_3(self) -> str:
         return self.generate_complex_operation(':', [(10, 40), (1, 8), (1, 6), (1, 4)], [True, False, False, True])
+
+
+# для тестов
+#ex = MyMath()
+#tasks = []
+#ans = []
+#for i in range(500):
+#    task = ex.generate_sum_stage_1()
+#    tasks.append(task)
+#    ans.append(ex.answer_for_all_stages(task))
+#for i, n in enumerate(tasks):
+#    print(i + 1, n)
+#print()
+#for i, n in enumerate(ans):
+#    print(i + 1, n)

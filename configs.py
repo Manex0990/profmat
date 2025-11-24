@@ -125,13 +125,10 @@ def get_biquadratic_solution(task):
 
             # Убираем дубликаты и сортируем численные корни
             real_roots_numeric = sorted(list(set(real_roots_numeric)))
-            real_roots_symbolic = sorted(list(set(real_roots_symbolic)),
-                                         key=lambda x: (x.startswith('-'), x))
 
             # Формируем окончательный ответ
             if real_roots_numeric:
                 steps.append('5. Действительные корни исходного уравнения:')
-                symbolic_str = '; '.join(real_roots_symbolic)
                 numeric_str = '; '.join([f'{x:.2f}' if x != 0 else '0' for x in real_roots_numeric])
                 steps.append(f'   x = {numeric_str}')
                 final_answer = ' '.join([f'{x:.2f}' if x != 0 else '0' for x in real_roots_numeric])
@@ -191,7 +188,6 @@ def get_biquadratic_solution(task):
             # Формируем окончательный ответ
             if real_roots_numeric:
                 steps.append('5. Действительные корни исходного уравнения:')
-                symbolic_str = '; '.join(real_roots_symbolic)
                 numeric_str = '; '.join([f'{x:.2f}' if x != 0 else '0' for x in real_roots_numeric])
                 steps.append(f'   x = {numeric_str}')
                 final_answer = ' '.join([f'{x:.2f}' if x != 0 else '0' for x in real_roots_numeric])
@@ -214,7 +210,96 @@ def get_biquadratic_solution(task):
     return steps
 
 
-TASK_CONFIG = {'biquadratic_equation': {'name': 'Биквадратное уравнение',
+def get_irrational_solution(task):
+    """
+    Функция для получения пошагового решения иррационального уравнения √(ax + b) = cx + d
+    """
+    steps = []
+
+    # Шаг 1: Находим коэффициенты уравнения
+    steps.append('1. Находим коэффициенты уравнения:')
+    a, b, c, d = ex.find_coofs_irrational_equation(task)
+    steps.append(f'   Уравнение: {task}')
+    steps.append(f'   Коэффициенты: a = {a}, b = {b}, c = {c}, d = {d}')
+
+    # Шаг 2: Анализ уравнения и условия существования
+    left_part = task.split(' = ')[1]  # получаем выражение из левой части уравнения
+    definition = -d / c
+    definition = int(definition) if definition.is_integer() else definition
+    steps.append('2. Анализ уравнения и условия существования:')
+    steps.append('   Уравнение вида √(ax + b) = cx + d')
+    steps.append('   Для существования решения должно выполняться условие:')
+    steps.append('   Правая часть неотрицательна: cx + d ≥ 0 (т.к. квадратный корень всегда ≥ 0)')
+    steps.append(f'  В нашем случае {left_part} ≥ 0')
+    steps.append(f'  Получим неравенство x ≥ {definition}')
+
+    # Шаг 3: Возведение в квадрат
+    right_part = task.split(' = ')[0]  # получаем выражение из правой части уравнения
+    under_root = right_part.replace('√', '').replace('(', '').replace(')', '')
+    steps.append('3. Возведем обе части уравнения в квадрат:')
+    steps.append(f'   ({right_part})² = ({left_part})²')
+    steps.append(f'   {under_root} = ({left_part})²')
+    steps.append(
+        '    Неотрицательность подкоренного выражения можно не проверять, так как оно равно квадрату некоторого выражения, которое всегда ≥ 0')
+
+    # Шаг 4: Раскрытие квадрата в правой части
+    a_temp, b_temp, c_temp = c ** 2, 2 * c * d, d ** 2
+    steps.append('4. Раскроем квадрат в правой части:')
+    right_expanded = f'{ex.generate_equation('quadratic', [a_temp, b_temp, c_temp]).replace(' = 0', '')}'
+    steps.append(f'   {under_root} = {right_expanded}')
+
+    # Шаг 5: Перенос всех членов в одну сторону
+    steps.append('5. Перенесем все члены в левую часть:')
+    equation = f'{under_root} - ({right_expanded}) = 0'
+    steps.append(f'   {equation}')
+
+    # Упрощаем
+    A = -c ** 2
+    B = a - 2 * c * d
+    C = b - d ** 2
+
+    simplified = f'{ex.generate_equation('quadratic', [A, B, C])}'
+    steps.append(f'   Упростим и получим: {simplified}')
+
+    # Шаг 6: Используем существующую функцию для получения корней
+    steps.append('6. Решаем полученное уравнение:')
+    roots_result = ex.answer_quadratic_equation(simplified)
+
+    # Анализируем результат
+    if roots_result == 'Корней нет':
+        steps.append('   Уравнение не имеет действительных корней')
+        final_answer = 'Корней нет'
+
+    else:
+        steps.append(f'   Найдены корни: {roots_result}')
+
+        # Шаг 7: Проверка условия неотрицательности правой части уравнения
+        steps.append('7. Проверяем условие неотрицательности правой части уравнения для найденных корней:')
+        steps.append(f'   x ≥ {definition}')
+
+        roots_list = list(map(float, roots_result.split()))
+
+        for root in roots_list:
+            if root >= definition:
+                steps.append(f'   Корень x = {root} ≥ {definition} ⇒ удовлетворяет условию неотрицательности правой части уравнения')
+            else:
+                steps.append(f'   Корень x = {root} < {definition} ⇒ не удовлетворяет условию неотрицательности правой части уравнения')
+
+        # Шаг 8: Формирование окончательного ответа
+        steps.append('8. Окончательный результат:')
+        final_answer = ex.answer_irrational_equation(task).rstrip('.0')
+
+    steps.append(f'Ответ: {final_answer}')
+
+    return steps
+
+
+TASK_CONFIG = {'irrational_equation': {'name': 'Иррациональное уравнение',
+                                       'generate_func': ex.generate_irrational_equation,
+                                       'check_func': ex.check_answer_irrational_equation,
+                                       'points': 40,
+                                       'get_solution': lambda task: get_irrational_solution(task)},
+               'biquadratic_equation': {'name': 'Биквадратное уравнение',
                                         'generate_func': ex.generate_biquadratic_equation,
                                         'check_func': ex.check_answer_biquadratic_equation,
                                         'points': 30,

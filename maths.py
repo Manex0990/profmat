@@ -405,9 +405,9 @@ class MyMath:
 #tasks = []
 #ans = []
 #for i in range(500):
-#    task = ex.generate_sum_stage_1()
+#    task = ex.generate_linear_equation()
 #    tasks.append(task)
-#    ans.append(ex.answer_for_all_stages(task))
+#    ans.append(ex.answer_linear_equation(task))
 #for i, n in enumerate(tasks):
 #    print(i + 1, n)
 #print()

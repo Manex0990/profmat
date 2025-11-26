@@ -105,6 +105,12 @@ def handle_task_request(group_id, task_key, cookie_name, template_name='task_ope
     return response
 
 
+@app.route('/student_groups/<int:group_id>/task/irrational_equation', methods=['GET', 'POST'])
+@login_required
+def open_task_irrational(group_id):
+    return handle_task_request(group_id, 'irrational_equation', 'cur_task_irrational_equation')
+
+
 @app.route('/student_groups/<int:group_id>/task/biquadratic_equation', methods=['GET', 'POST'])
 @login_required
 def open_task_biquadratic(group_id):

@@ -219,17 +219,17 @@ def get_irrational_solution(task):
     # Шаг 1: Находим коэффициенты уравнения
     steps.append('1. Находим коэффициенты уравнения:')
     a, b, c, d = ex.find_coofs_irrational_equation(task)
-    steps.append(f'   Уравнение: {task}')
     steps.append(f'   Коэффициенты: a = {a}, b = {b}, c = {c}, d = {d}')
 
     # Шаг 2: Анализ уравнения и условия существования
     left_part = task.split(' = ')[1]  # получаем выражение из левой части уравнения
     definition = -d / c
-    definition = int(definition) if definition.is_integer() else definition
+    definition = int(definition) if definition.is_integer() else round(definition, 2) if len(
+        str(definition)) > 10 else definition
     steps.append('2. Анализ уравнения и условия существования:')
-    steps.append('   Уравнение вида √(ax + b) = cx + d')
+    steps.append('   Уравнение вида √f(x) = g(x)')
     steps.append('   Для существования решения должно выполняться условие:')
-    steps.append('   Правая часть неотрицательна: cx + d ≥ 0 (т.к. квадратный корень всегда ≥ 0)')
+    steps.append('   Правая часть неотрицательна: g(x) ≥ 0 (т.к. квадратный корень всегда ≥ 0)')
     steps.append(f'  В нашем случае {left_part} ≥ 0')
     steps.append(f'  Получим неравенство x ≥ {definition}')
 
@@ -240,7 +240,7 @@ def get_irrational_solution(task):
     steps.append(f'   ({right_part})² = ({left_part})²')
     steps.append(f'   {under_root} = ({left_part})²')
     steps.append(
-        '    Неотрицательность подкоренного выражения можно не проверять, так как оно равно квадрату некоторого выражения, которое всегда ≥ 0')
+        '    Неотрицательность подкоренного выражения можно не проверять, так как оно равно квадрату некоторого выражения, а квадрат всегда ≥ 0')
 
     # Шаг 4: Раскрытие квадрата в правой части
     a_temp, b_temp, c_temp = c ** 2, 2 * c * d, d ** 2
@@ -281,9 +281,11 @@ def get_irrational_solution(task):
 
         for root in roots_list:
             if root >= definition:
-                steps.append(f'   Корень x = {root} ≥ {definition} ⇒ удовлетворяет условию неотрицательности правой части уравнения')
+                steps.append(
+                    f'   Корень x = {root} ≥ {definition} ⇒ удовлетворяет условию неотрицательности правой части уравнения')
             else:
-                steps.append(f'   Корень x = {root} < {definition} ⇒ не удовлетворяет условию неотрицательности правой части уравнения')
+                steps.append(
+                    f'   Корень x = {root} < {definition} ⇒ не удовлетворяет условию неотрицательности правой части уравнения')
 
         # Шаг 8: Формирование окончательного ответа
         steps.append('8. Окончательный результат:')

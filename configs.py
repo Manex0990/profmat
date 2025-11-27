@@ -289,7 +289,10 @@ def get_irrational_solution(task):
 
         # Шаг 8: Формирование окончательного ответа
         steps.append('8. Окончательный результат:')
-        final_answer = ex.answer_irrational_equation(task).rstrip('.0')
+        if ex.answer_irrational_equation(task) != 0.0:
+            final_answer = ex.answer_irrational_equation(task).rstrip('.0')
+        else:
+            final_answer = '0'
 
     steps.append(f'Ответ: {final_answer}')
 

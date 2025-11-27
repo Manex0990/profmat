@@ -66,7 +66,7 @@ def validate_group_access(group_id, user_id):
         db_sess.close()
 
 
-def handle_task_request(group_id, task_key, cookie_name, template_name='task_opened.html'):
+def handle_task_request(group_id, task_key, cookie_name, show_solution=False, template_name='task_opened.html'):
     """Универсальный обработчик для всех типов задач"""
     group, group_member = validate_group_access(group_id, current_user.id)
     if not group:
@@ -75,11 +75,24 @@ def handle_task_request(group_id, task_key, cookie_name, template_name='task_ope
     config = TASK_CONFIG[task_key]
     points = config['points']
     task = str(request.cookies.get(cookie_name, config['generate_func']()))
+    print(task)
     form = TaskForm()
 
+    # Обработка запроса на показ решения
+    show_solution_param = request.args.get('show_solution') == 'true' or show_solution
+
     if request.method == 'GET':
+        solution_log = None
+        message = ''
+
+        if show_solution_param:
+            solution_log = config['get_solution'](task)
+            message = 'Решение показано'
+
         response = make_response(
-            render_template(template_name, title=config['name'], group=group, task=task, form=form, points=points))
+            render_template(template_name, title=config['name'], group=group, task=task, form=form,
+                            points=points, solution_log=solution_log, show_solution=show_solution_param,
+                            task_key=task_key, message=message))
         response.set_cookie(cookie_name, value=str(task), max_age=60 * 60 * 24 * 365 * 2)
         return response
 
@@ -91,13 +104,19 @@ def handle_task_request(group_id, task_key, cookie_name, template_name='task_ope
         update_points(group_id, current_user.id, config['points'])
         solution_log = config['get_solution'](task)
         message_type = 'success'
+        show_solution_param = True  # Показываем решение после правильного ответа
     else:
-        solution_log = ['Дайте верный ответ, чтобы получить решение.']
+        solution_log = None
         message_type = 'error'
+        # Даже при неправильном ответе можем показать решение, если был запрос
+        if request.args.get('show_solution') == 'true':
+            solution_log = config['get_solution'](task)
+            show_solution_param = True
 
     response = make_response(render_template(template_name, title=config['name'], group=group, task=task,
                                              form=form, solution_log=solution_log, message=verdict[0],
-                                             message_type=message_type, points=points))
+                                             message_type=message_type, points=points,
+                                             show_solution=show_solution_param, task_key=task_key))
 
     if verdict[1]:
         response.set_cookie(cookie_name, '', max_age=0)
@@ -107,37 +126,38 @@ def handle_task_request(group_id, task_key, cookie_name, template_name='task_ope
 
 @app.route('/student_groups/<int:group_id>/task/irrational_equation', methods=['GET', 'POST'])
 @login_required
-def open_task_irrational(group_id):
-    return handle_task_request(group_id, 'irrational_equation', 'cur_task_irrational_equation')
+def open_task_irrational_equation(group_id):
+    show_solution = request.args.get('show_solution') == 'true'
+    return handle_task_request(group_id, 'irrational_equation', 'cur_task_irrational_equation', show_solution)
 
 
 @app.route('/student_groups/<int:group_id>/task/biquadratic_equation', methods=['GET', 'POST'])
 @login_required
-def open_task_biquadratic(group_id):
-    return handle_task_request(group_id, 'biquadratic_equation', 'cur_task_biquadratic_equation')
+def open_task_biquadratic_equation(group_id):
+    show_solution = request.args.get('show_solution') == 'true'
+    return handle_task_request(group_id, 'biquadratic_equation', 'cur_task_biquadratic_equation', show_solution)
 
 
 @app.route('/student_groups/<int:group_id>/task/quadratic_equation', methods=['GET', 'POST'])
 @login_required
-def open_task_square(group_id):
-    return handle_task_request(group_id, 'quadratic_equation', 'cur_task_quadratic_equation')
+def open_task_quadratic_equation(group_id):
+    show_solution = request.args.get('show_solution') == 'true'
+    return handle_task_request(group_id, 'quadratic_equation', 'cur_task_quadratic_equation', show_solution)
 
 
 @app.route('/student_groups/<int:group_id>/task/linear_equation', methods=['GET', 'POST'])
 @login_required
-def open_task_line(group_id):
-    return handle_task_request(group_id, 'linear_equation', 'cur_task_linear_equation')
+def open_task_linear_equation(group_id):
+    show_solution = request.args.get('show_solution') == 'true'
+    return handle_task_request(group_id, 'linear_equation', 'cur_task_linear_equation', show_solution)
 
 
 @app.route('/student_groups/<int:group_id>/task/<operation>/<int:level>', methods=['GET', 'POST'])
 @login_required
 def open_task_example(group_id, operation, level):
     task_key = f'{operation}_{level}'
-    if task_key not in TASK_CONFIG:
-        flash("Задача не найдена", "error")
-        return redirect(url_for('student_groups'))
-
-    return handle_task_request(group_id, task_key, 'cur_task_operation')
+    show_solution = request.args.get('show_solution') == 'true'
+    return handle_task_request(group_id, task_key, 'cur_task_operation', show_solution)
 
 
 @app.route('/student_groups/<int:group_id>/task', methods=['GET', 'POST'])
@@ -158,9 +178,26 @@ def open_task_menu(group_id):
         res.set_cookie('cur_task_biquadratic_equation', '', max_age=0)
         res.set_cookie('cur_task_quadratic_equation', '', max_age=0)
         res.set_cookie('cur_task_linear_equation', '', max_age=0)
+        res.set_cookie('cur_task_irrational_equation', '', max_age=0)
         return res
     finally:
         db_sess.close()
+
+
+@app.route('/student_groups/<int:group_id>/task/<task_type>/show_solution')
+@login_required
+def show_solution(group_id, task_type):
+    """Показать решение задачи без проверки ответа"""
+    # Определяем соответствующий маршрут для типа задачи
+    route_mapping = {
+        'linear_equation': 'open_task_linear_equation',
+        'quadratic_equation': 'open_task_quadratic_equation',
+        'biquadratic_equation': 'open_task_biquadratic_equation',
+        'irrational_equation': 'open_task_irrational_equation'
+    }
+
+    if task_type in route_mapping:
+        return redirect(url_for(route_mapping[task_type], group_id=group_id, show_solution='true'))
 
 
 @app.route('/student_groups/<int:group_id>/task/<name>', methods=['GET', 'POST'])

@@ -4,13 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="little fix">
+    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="all working irrational equations">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/configs.py" beforeDir="false" afterPath="$PROJECT_DIR$/configs.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db/web.db" beforeDir="false" afterPath="$PROJECT_DIR$/db/web.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maths.py" beforeDir="false" afterPath="$PROJECT_DIR$/maths.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/task_opened.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/task_opened.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/task_window.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/task_window.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -436,7 +435,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764018473162</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="all working irrational equations">
+      <option name="closed" value="true" />
+      <created>1764186009635</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1764186009635</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -451,7 +458,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="more optimization" />
     <MESSAGE value="fix bag in find_coofs_square_x" />
     <MESSAGE value="rename variable" />
     <MESSAGE value="upgrade requirements.txt" />
@@ -476,6 +482,7 @@
     <MESSAGE value="little change ranges in random generate" />
     <MESSAGE value="много исправлений: теперь если дробь конечная то до сотых округлять не надо, баг с проверкой иррационального уравнения. все задания работают корректно. добавлено подробное решение иррационального уравнения" />
     <MESSAGE value="little fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="little fix" />
+    <MESSAGE value="all working irrational equations" />
+    <option name="LAST_COMMIT_MESSAGE" value="all working irrational equations" />
   </component>
 </project>

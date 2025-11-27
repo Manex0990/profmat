@@ -16,10 +16,10 @@ class MyMath:
             'biquadratic': {'patterns': [(r'([+-]?\d*)x⁴', 'a'),  # x⁴
                                          (r'([+-]?\d*)x²(?!⁴)', 'b'),  # x²
                                          (r'([+-]?\d+)(?!.*x)', 'c')], 'format_terms': ['x⁴', 'x²', '']},
-            'irrational': {'patterns': [(r'√\W([+-]?\d*)x', 'a'),  # x под корнем
-                                        (r'([+-]?\d+)[^x]\W', 'b'),  # свободный член под корнем
-                                        (r'[^√]\W([+-]?\d*)x', 'c'),  # x
-                                        (r'([+-]?\d*)(?!.*x)', 'd')],
+            'irrational': {'patterns': [(r'√\s*\(\s*([+-]?\d*)x', 'a'),  # a: выражение под корнем перед x
+                                        (r'√\s*\(\s*[^)]*?([+-]?\d+)(?:\s*[^x]|$)', 'b'),  # b: свободный член под корнем
+                                        (r'=\s*([+-]?\d*)x', 'c'),  # c: x вне корня (правая часть уравнения)
+                                        (r'=\s*[^=]*?([+-]?\d+)(?:\s*[^x]|$)', 'd')],  # d: свободный член вне корня (правая часть уравнения)
                            'format_terms': ['x', '', 'x', '']}, }  # свободный член
         self.OPERATIONS = {'s': sum,
                            'm': lambda nums: nums[0] - sum(nums[1:]),
@@ -189,7 +189,8 @@ class MyMath:
             if (c > 0 and route >= eq_definition) or (c < 0 and route <= eq_definition):
                 ans.append(str(route))
         return ' '.join(
-            str(int(x)) if x.is_integer() else str(round(x, 2)) if len(str(x)) > 10 else str(x) for x in list(map(float, ans))) if ans else 'Корней нет'
+            str(int(x)) if x.is_integer() else str(round(x, 2)) if len(str(x)) > 10 else str(x) for x in
+            list(map(float, ans))) if ans else 'Корней нет'
 
     def check_answer(self, task: str, user_answer: str, eq_type: str) -> List:
         """Проверяет ответ для уравнения"""
@@ -399,17 +400,16 @@ class MyMath:
     def generate_crop_stage_3(self) -> str:
         return self.generate_complex_operation(':', [(10, 40), (1, 8), (1, 6), (1, 4)], [True, False, False, True])
 
-
 # для тестов
-#ex = MyMath()
-#tasks = []
-#ans = []
-#for i in range(500):
+# ex = MyMath()
+# tasks = []
+# ans = []
+# for i in range(500):
 #    task = ex.generate_linear_equation()
 #    tasks.append(task)
 #    ans.append(ex.answer_linear_equation(task))
-#for i, n in enumerate(tasks):
+# for i, n in enumerate(tasks):
 #    print(i + 1, n)
-#print()
-#for i, n in enumerate(ans):
+# print()
+# for i, n in enumerate(ans):
 #    print(i + 1, n)

@@ -75,7 +75,6 @@ def handle_task_request(group_id, task_key, cookie_name, show_solution=False, te
     config = TASK_CONFIG[task_key]
     points = config['points']
     task = str(request.cookies.get(cookie_name, config['generate_func']()))
-    print(task)
     form = TaskForm()
 
     # Обработка запроса на показ решения
@@ -195,9 +194,7 @@ def show_solution(group_id, task_type):
         'biquadratic_equation': 'open_task_biquadratic_equation',
         'irrational_equation': 'open_task_irrational_equation'
     }
-
-    if task_type in route_mapping:
-        return redirect(url_for(route_mapping[task_type], group_id=group_id, show_solution='true'))
+    return redirect(url_for(route_mapping[task_type], group_id=group_id, show_solution='true'))
 
 
 @app.route('/student_groups/<int:group_id>/task/<name>', methods=['GET', 'POST'])

@@ -4,12 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="all working irrational equations">
+    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="now u can open solution">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db/web.db" beforeDir="false" afterPath="$PROJECT_DIR$/db/web.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maths.py" beforeDir="false" afterPath="$PROJECT_DIR$/maths.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/task_opened.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/task_opened.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -443,7 +441,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764186009635</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="now u can open solution">
+      <option name="closed" value="true" />
+      <created>1764279169518</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1764279169518</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -458,7 +464,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix bag in find_coofs_square_x" />
     <MESSAGE value="rename variable" />
     <MESSAGE value="upgrade requirements.txt" />
     <MESSAGE value="more optimization in server.py" />
@@ -483,6 +488,7 @@
     <MESSAGE value="много исправлений: теперь если дробь конечная то до сотых округлять не надо, баг с проверкой иррационального уравнения. все задания работают корректно. добавлено подробное решение иррационального уравнения" />
     <MESSAGE value="little fix" />
     <MESSAGE value="all working irrational equations" />
-    <option name="LAST_COMMIT_MESSAGE" value="all working irrational equations" />
+    <MESSAGE value="now u can open solution" />
+    <option name="LAST_COMMIT_MESSAGE" value="now u can open solution" />
   </component>
 </project>

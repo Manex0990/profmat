@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="now u can open solution">
+    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="little fix">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db/web.db" beforeDir="false" afterPath="$PROJECT_DIR$/db/web.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server.py" afterDir="false" />
@@ -449,7 +449,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764279169518</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="little fix">
+      <option name="closed" value="true" />
+      <created>1764280340981</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1764280340981</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -486,9 +494,9 @@
     <MESSAGE value="add answer and check_asnwer funcs for irrational equations" />
     <MESSAGE value="little change ranges in random generate" />
     <MESSAGE value="много исправлений: теперь если дробь конечная то до сотых округлять не надо, баг с проверкой иррационального уравнения. все задания работают корректно. добавлено подробное решение иррационального уравнения" />
-    <MESSAGE value="little fix" />
     <MESSAGE value="all working irrational equations" />
     <MESSAGE value="now u can open solution" />
-    <option name="LAST_COMMIT_MESSAGE" value="now u can open solution" />
+    <MESSAGE value="little fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="little fix" />
   </component>
 </project>

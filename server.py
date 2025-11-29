@@ -100,7 +100,8 @@ def handle_task_request(group_id, task_key, cookie_name, show_solution=False, te
     verdict = config['check_func'](task, user_answer)
 
     if verdict[1]:
-        update_points(group_id, current_user.id, config['points'])
+        if request.cookies.get('solution') == '0':  # начисляем баллы, только если пользователь не видел решения задания
+            update_points(group_id, current_user.id, config['points'])
         solution_log = config['get_solution'](task)
         message_type = 'success'
         show_solution_param = True  # Показываем решение после правильного ответа
@@ -174,6 +175,8 @@ def open_task_menu(group_id):
             flash("Вы не состоите в этой группе!", "error")
             return redirect(url_for('student_groups'))
         res = make_response(render_template('task_window.html', group=group))
+        # Сбрасываем значение ключа solution на 0 при входе в меню заданий
+        res.set_cookie('solution', '0', max_age=60 * 60 * 24 * 365 * 2)
         res.set_cookie('cur_task_biquadratic_equation', '', max_age=0)
         res.set_cookie('cur_task_quadratic_equation', '', max_age=0)
         res.set_cookie('cur_task_linear_equation', '', max_age=0)
@@ -187,14 +190,10 @@ def open_task_menu(group_id):
 @login_required
 def show_solution(group_id, task_type):
     """Показать решение задачи без проверки ответа"""
-    # Определяем соответствующий маршрут для типа задачи
-    route_mapping = {
-        'linear_equation': 'open_task_linear_equation',
-        'quadratic_equation': 'open_task_quadratic_equation',
-        'biquadratic_equation': 'open_task_biquadratic_equation',
-        'irrational_equation': 'open_task_irrational_equation'
-    }
-    return redirect(url_for(route_mapping[task_type], group_id=group_id, show_solution='true'))
+    # Устанавливаем значение ключа solution в 1 при открытии страницы решения
+    response = redirect(url_for(route_mapping[task_type], group_id=group_id, show_solution='true'))
+    response.set_cookie('solution', '1', max_age=60 * 60 * 24 * 365 * 2)
+    return response
 
 
 @app.route('/student_groups/<int:group_id>/task/<name>', methods=['GET', 'POST'])
@@ -216,6 +215,15 @@ def open_change_level_window(group_id, name):
         return res
     finally:
         db_sess.close()
+
+
+# Добавляем словарь route_mapping для функции show_solution
+route_mapping = {
+    'linear_equation': 'open_task_linear_equation',
+    'quadratic_equation': 'open_task_quadratic_equation',
+    'biquadratic_equation': 'open_task_biquadratic_equation',
+    'irrational_equation': 'open_task_irrational_equation'
+}
 
 
 @login_manager.user_loader

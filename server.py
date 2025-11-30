@@ -10,7 +10,7 @@ from form.task import TaskForm
 from sqlalchemy.orm import joinedload
 from werkzeug.utils import secure_filename
 import os
-from configs import TASK_CONFIG, OPERATIONS_CONFIG, ex
+from configs import TASK_CONFIG, OPERATIONS_CONFIG, route_mapping, ex
 
 app = Flask(__name__, static_folder='static')
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -47,7 +47,7 @@ def update_points(group_id, user_id, points):
         db_sess.close()
 
 
-def validate_group_access(group_id, user_id):
+def validate_group_access(group_id):
     """Проверка доступа пользователя к группе"""
     db_sess = db_session.create_session()
     try:
@@ -56,7 +56,7 @@ def validate_group_access(group_id, user_id):
             flash("Группа не найдена", "error")
             return None, None
 
-        group_member = db_sess.query(GroupMember).filter_by(user_id=user_id, group_id=group_id).first()
+        group_member = db_sess.query(GroupMember).filter_by(user_id=current_user.id, group_id=group_id).first()
         if not group_member:
             flash("Вы не состоите в этой группе!", "error")
             return None, None
@@ -68,7 +68,7 @@ def validate_group_access(group_id, user_id):
 
 def handle_task_request(group_id, task_key, cookie_name, show_solution=False, template_name='task_opened.html'):
     """Универсальный обработчик для всех типов задач"""
-    group, group_member = validate_group_access(group_id, current_user.id)
+    group, group_member = validate_group_access(group_id)
     if not group:
         return redirect(url_for('student_groups'))
 
@@ -103,19 +103,16 @@ def handle_task_request(group_id, task_key, cookie_name, show_solution=False, te
         if request.cookies.get('solution') == '0':  # начисляем баллы, только если пользователь не видел решения задания
             update_points(group_id, current_user.id, config['points'])
         solution_log = config['get_solution'](task)
-        message_type = 'success'
         show_solution_param = True  # Показываем решение после правильного ответа
     else:
         solution_log = None
-        message_type = 'error'
         # Даже при неправильном ответе можем показать решение, если был запрос
         if request.args.get('show_solution') == 'true':
             solution_log = config['get_solution'](task)
             show_solution_param = True
 
     response = make_response(render_template(template_name, title=config['name'], group=group, task=task,
-                                             form=form, solution_log=solution_log, message=verdict[0],
-                                             message_type=message_type, points=points,
+                                             form=form, solution_log=solution_log, message=verdict[0], points=points,
                                              show_solution=show_solution_param, task_key=task_key))
 
     if verdict[1]:
@@ -164,18 +161,12 @@ def open_task_example(group_id, operation, level):
 def open_task_menu(group_id):
     db_sess = db_session.create_session()
     try:
-        group = db_sess.query(Group).filter(Group.id == group_id).first()
-
+        group, group_member = validate_group_access(group_id)
         if not group:
-            flash("Группа не найдена", "error")
             return redirect(url_for('student_groups'))
 
-        group_member = db_sess.query(GroupMember).filter_by(user_id=current_user.id, group_id=group_id).first()
-        if not group_member:
-            flash("Вы не состоите в этой группе!", "error")
-            return redirect(url_for('student_groups'))
         res = make_response(render_template('task_window.html', group=group))
-        # Сбрасываем значение ключа solution на 0 при входе в меню заданий
+        # Сбрасываем значения ключей cookie
         res.set_cookie('solution', '0', max_age=60 * 60 * 24 * 365 * 2)
         res.set_cookie('cur_task_biquadratic_equation', '', max_age=0)
         res.set_cookie('cur_task_quadratic_equation', '', max_age=0)
@@ -190,7 +181,7 @@ def open_task_menu(group_id):
 @login_required
 def show_solution(group_id, task_type):
     """Показать решение задачи без проверки ответа"""
-    # Устанавливаем значение ключа solution в 1 при открытии страницы решения
+    # Устанавливаем значение ключа solution в 1 при открытии страницы решения, так как пользователь видел решение
     response = redirect(url_for(route_mapping[task_type], group_id=group_id, show_solution='true'))
     response.set_cookie('solution', '1', max_age=60 * 60 * 24 * 365 * 2)
     return response
@@ -200,30 +191,15 @@ def show_solution(group_id, task_type):
 def open_change_level_window(group_id, name):
     db_sess = db_session.create_session()
     try:
-        group = db_sess.query(Group).filter(Group.id == group_id).first()
-
+        group, group_member = validate_group_access(group_id)
         if not group:
-            flash("Группа не найдена", "error")
             return redirect(url_for('student_groups'))
 
-        group_member = db_sess.query(GroupMember).filter_by(user_id=current_user.id, group_id=group_id).first()
-        if not group_member:
-            flash("Вы не состоите в этой группе!", "error")
-            return redirect(url_for('student_groups'))
         res = make_response(render_template('change_level_window.html', group=group, name=name))
         res.set_cookie('cur_task_operation', '', max_age=0)
         return res
     finally:
         db_sess.close()
-
-
-# Добавляем словарь route_mapping для функции show_solution
-route_mapping = {
-    'linear_equation': 'open_task_linear_equation',
-    'quadratic_equation': 'open_task_quadratic_equation',
-    'biquadratic_equation': 'open_task_biquadratic_equation',
-    'irrational_equation': 'open_task_irrational_equation'
-}
 
 
 @login_manager.user_loader

@@ -351,3 +351,8 @@ OPERATIONS_CONFIG = {'sum': {'sum': 'сложим', 'name': 'Пример на �
                      'min': {'min': 'вычтем', 'name': 'Пример на вычитание', 'points': [5, 8, 10]},
                      'mul': {'mul': 'перемножим', 'name': 'Пример на умножение', 'points': [7, 10, 12]},
                      'crop': {'crop': 'разделим', 'name': 'Пример на деление', 'points': [10, 12, 15]}}
+
+route_mapping = {'linear_equation': 'open_task_linear_equation',
+                 'quadratic_equation': 'open_task_quadratic_equation',
+                 'biquadratic_equation': 'open_task_biquadratic_equation',
+                 'irrational_equation': 'open_task_irrational_equation'}

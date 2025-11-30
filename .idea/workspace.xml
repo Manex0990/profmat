@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="little fix">
+    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="fix bug with browser back button">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/configs.py" beforeDir="false" afterPath="$PROJECT_DIR$/configs.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db/web.db" beforeDir="false" afterPath="$PROJECT_DIR$/db/web.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server.py" afterDir="false" />
     </list>
@@ -457,7 +458,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764280340981</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="fix bug with browser back button">
+      <option name="closed" value="true" />
+      <created>1764433627309</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1764433627309</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -472,7 +481,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="rename variable" />
     <MESSAGE value="upgrade requirements.txt" />
     <MESSAGE value="more optimization in server.py" />
     <MESSAGE value="putting configs in a separate file" />
@@ -497,6 +505,7 @@
     <MESSAGE value="all working irrational equations" />
     <MESSAGE value="now u can open solution" />
     <MESSAGE value="little fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="little fix" />
+    <MESSAGE value="fix bug with browser back button" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix bug with browser back button" />
   </component>
 </project>

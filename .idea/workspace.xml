@@ -4,11 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="fix bug with browser back button">
+    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="optimization">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/configs.py" beforeDir="false" afterPath="$PROJECT_DIR$/configs.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db/web.db" beforeDir="false" afterPath="$PROJECT_DIR$/db/web.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maths.py" beforeDir="false" afterPath="$PROJECT_DIR$/maths.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/change_level_window.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/change_level_window.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/task_window.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/task_window.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,7 +67,7 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
 }</component>
-  <component name="RunManager" selected="Python.server">
+  <component name="RunManager" selected="Python.maths">
     <configuration name="30" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="profmat" />
       <option name="ENV_FILES" value="" />
@@ -180,8 +180,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.server" />
         <item itemvalue="Python.maths" />
+        <item itemvalue="Python.server" />
         <item itemvalue="Python.configs" />
         <item itemvalue="Python.30" />
       </list>
@@ -466,7 +466,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764433627309</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="optimization">
+      <option name="closed" value="true" />
+      <created>1764502157035</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1764502157035</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -481,7 +489,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="upgrade requirements.txt" />
     <MESSAGE value="more optimization in server.py" />
     <MESSAGE value="putting configs in a separate file" />
     <MESSAGE value="delete not used import" />
@@ -506,6 +513,7 @@
     <MESSAGE value="now u can open solution" />
     <MESSAGE value="little fix" />
     <MESSAGE value="fix bug with browser back button" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix bug with browser back button" />
+    <MESSAGE value="optimization" />
+    <option name="LAST_COMMIT_MESSAGE" value="optimization" />
   </component>
 </project>

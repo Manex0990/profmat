@@ -9,30 +9,37 @@ import re
 class MyMath:
     def __init__(self):
         self.equation_types = {
+            'linear_inequation': {'patterns': [],
+                                  'format_terms': ['x', '', 'x', '', 'x', '', 'x', '']},
             'quadratic': {'patterns': [(r'([+-]?\d*)x²', 'a'),  # x²
                                        (r'([+-]?\d*)x(?!²)', 'b'),  # x
                                        (r'([+-]?\d+)(?!.*x)', 'c')],
                           'format_terms': ['x²', 'x', '']},
             'biquadratic': {'patterns': [(r'([+-]?\d*)x⁴', 'a'),  # x⁴
                                          (r'([+-]?\d*)x²(?!⁴)', 'b'),  # x²
-                                         (r'([+-]?\d+)(?!.*x)', 'c')], 'format_terms': ['x⁴', 'x²', '']},
-            'irrational': {'patterns': [(r'√\s*\(\s*([+-]?\d*)x', 'a'),  # a: выражение под корнем перед x
-                                        (r'√\s*\(\s*[^)]*?([+-]?\d+)(?:\s*[^x]|$)', 'b'),  # b: свободный член под корнем
-                                        (r'=\s*([+-]?\d*)x', 'c'),  # c: x вне корня (правая часть уравнения)
-                                        (r'=\s*[^=]*?([+-]?\d+)(?:\s*[^x]|$)', 'd')],  # d: свободный член вне корня (правая часть уравнения)
-                           'format_terms': ['x', '', 'x', '']}, }  # свободный член
+                                         (r'([+-]?\d+)(?!.*x)', 'c')],
+                            'format_terms': ['x⁴', 'x²', '']},
+            'irrational': {'patterns': [(r'√\s*\(\s*([+-]?\d*)x', 'a'),  # под корнем перед x
+                                        (r'√\s*\(\s*[^)]*?([+-]?\d+)(?:\s*[^x]|$)', 'b'),  # свободный член под корнем
+                                        (r'=\s*([+-]?\d*)x', 'c'),  # x вне корня (правая часть уравнения)
+                                        (r'=\s*[^=]*?([+-]?\d+)(?:\s*[^x]|$)', 'd')],
+                           # свободный член вне корня (правая часть уравнения)
+                           'format_terms': ['x', '', 'x', '']}, }
         self.OPERATIONS = {'s': sum,
                            'm': lambda nums: nums[0] - sum(nums[1:]),
                            'mul': lambda nums: self.product(nums),
                            'cr': lambda nums: self.divide_sequence(nums)}
 
-    def generate_random_numbers(self):
+    def generate_random_numbers(self) -> List[int]:
         nums_range = list(itertools.chain(range(-9, 0), range(1, 10)))  # диапазон целых чисел от -9 до 9, не включая 0
         a = choice(nums_range)
         b = choice(nums_range)
         c = choice(nums_range)
         d = choice(nums_range)
-        return a, b, c, d
+        return [a, b, c, d]
+
+    def generate_random_symbol(self) -> str:
+        return choice(['<', '>', '≤', '≥'])
 
     def format_equation_term(self, coeff: int, variable: str = '', is_first: bool = False) -> str:
         """Форматирует коэффициент уравнения"""
@@ -51,12 +58,25 @@ class MyMath:
         else:
             return f"{sign}{abs_coeff}"
 
+    def format_inequation_term(self, x_coef, x_term, const, const_term, is_first=False):
+        """Форматирование скобок линейного неравенства"""
+        if x_coef < 0:
+            # Если коэффициент перед x отрицательный, то он меняется местами со свободным членом скобки
+            x_part = self.format_equation_term(x_coef, x_term, False)
+            const_part = self.format_equation_term(abs(const), const_term, is_first)
+            return f'({const_part}{x_part})'
+        else:
+            # Для положительных коэффициентов перед x
+            x_part = self.format_equation_term(x_coef, x_term, is_first)
+            const_part = self.format_equation_term(const, const_term)
+            return f'({x_part}{const_part})'
+
     def generate_equation(self, eq_type: str, use_not_random_coofs=None) -> str:
         """Генерирует уравнение заданного типа"""
         if not use_not_random_coofs:
             a, b, c, d = self.generate_random_numbers()
         else:
-            a, b, c = use_not_random_coofs
+            a, b, c = use_not_random_coofs  # генерирует уравнение с конкретно заданными коэффициентами
         terms = self.equation_types[eq_type]['format_terms']
         equation = self.format_equation_term(a, terms[0], True)
         equation += self.format_equation_term(b, terms[1])
@@ -77,6 +97,19 @@ class MyMath:
         right_side = self.format_equation_term(c, terms[2], True)
         right_side += self.format_equation_term(d, terms[3])
         return f'√({left_side}) = {right_side}'
+
+    def generate_linear_inequation(self) -> str:
+        a, b, c, d = self.generate_random_numbers()
+        a_x, b_x, c_x, d_x = self.generate_random_numbers()
+        terms = self.equation_types['linear_inequation']['format_terms']
+
+        inequation = self.format_inequation_term(a_x, terms[0], a, terms[1], True)
+        inequation += self.format_inequation_term(b_x, terms[2], b, terms[3], True)
+        inequation += self.format_inequation_term(c_x, terms[4], c, terms[5], True)
+        inequation += self.format_inequation_term(d_x, terms[6], d, terms[7], True)
+
+        symbol = self.generate_random_symbol()
+        return f'{inequation} {symbol} 0'
 
     def find_coefficients(self, equation: str, eq_type: str) -> List[int]:
         """Находит коэффициенты уравнения"""
@@ -191,6 +224,9 @@ class MyMath:
         return ' '.join(
             str(int(x)) if x.is_integer() else str(round(x, 2)) if len(str(x)) > 10 else str(x) for x in
             list(map(float, ans))) if ans else 'Корней нет'
+
+    def answer_linear_inequation(self):
+        pass
 
     def check_answer(self, task: str, user_answer: str, eq_type: str) -> List:
         """Проверяет ответ для уравнения"""
@@ -400,16 +436,6 @@ class MyMath:
     def generate_crop_stage_3(self) -> str:
         return self.generate_complex_operation(':', [(10, 40), (1, 8), (1, 6), (1, 4)], [True, False, False, True])
 
-# для тестов
-# ex = MyMath()
-# tasks = []
-# ans = []
-# for i in range(500):
-#    task = ex.generate_linear_equation()
-#    tasks.append(task)
-#    ans.append(ex.answer_linear_equation(task))
-# for i, n in enumerate(tasks):
-#    print(i + 1, n)
-# print()
-# for i, n in enumerate(ans):
-#    print(i + 1, n)
+
+ex = MyMath()
+print(ex.generate_linear_inequation())

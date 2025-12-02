@@ -1,5 +1,4 @@
 import functools
-import math
 from random import randint, uniform, choice
 from typing import List, Tuple
 import itertools
@@ -9,6 +8,10 @@ import re
 class MyMath:
     def __init__(self):
         self.equation_types = {
+            'linear': {'patterns': [(r'([+-]?\d*)x', 'a'),  # коэффициент при x
+                                    (r'(?:(?<=x)|^)([+-]?\d+)(?=[^\d]*=)', 'b'),  # свободный член слева
+                                    (r'=\s*([+-]?\d+)', 'c')],
+                       'format_terms': ['x', '']},
             'linear_inequation': {'patterns': [],
                                   'format_terms': ['x', '', 'x', '', 'x', '', 'x', '']},
             'quadratic': {'patterns': [(r'([+-]?\d*)x²', 'a'),  # x²
@@ -29,6 +32,10 @@ class MyMath:
                            'm': lambda nums: nums[0] - sum(nums[1:]),
                            'mul': lambda nums: self.product(nums),
                            'cr': lambda nums: self.divide_sequence(nums)}
+        self.symbols_change = {'>': '<',
+                               '<': '>',
+                               '≤': '≥',
+                               '≥': '≤'}
 
     def generate_random_numbers(self) -> List[int]:
         nums_range = list(itertools.chain(range(-9, 0), range(1, 10)))  # диапазон целых чисел от -9 до 9, не включая 0
@@ -80,8 +87,20 @@ class MyMath:
         terms = self.equation_types[eq_type]['format_terms']
         equation = self.format_equation_term(a, terms[0], True)
         equation += self.format_equation_term(b, terms[1])
-        equation += self.format_equation_term(c, terms[2])
+        equation += self.format_equation_term(c, terms[2]) if len(terms) > 2 else ''
         return f"{equation} = 0"
+
+    def generate_linear_equation(self) -> str:
+        """Генерирует линейное уравнение вида ax + b = c, при отрицательном a: b - ax = c"""
+        a, b, c = self.generate_random_numbers()[:3]
+        terms = self.equation_types['linear']['format_terms']
+
+        if a < 0:
+            equation = self.format_inequation_term(abs(b), terms[1], a, terms[0], True)[1:-1]
+        else:
+            equation = self.format_inequation_term(a, terms[0], b, terms[1], True)[1:-1]
+        equation += f' = {c}'
+        return equation
 
     def generate_quadratic_equation(self) -> str:
         return self.generate_equation('quadratic')
@@ -111,11 +130,60 @@ class MyMath:
         symbol = self.generate_random_symbol()
         return f'{inequation} {symbol} 0'
 
+    def normalize_linear_equation_format(self, equation: str) -> str:
+        """Нормализует линейное уравнение: преобразует b - ax = c в -ax + b = c для парсинга"""
+        # Убираем пробелы
+        eq = equation.replace(' ', '')
+
+        # Разделяем на левую и правую части
+        if '=' not in eq:
+            return equation
+
+        left_part, right_part = eq.split('=')
+
+        # Проверяем формат b - ax
+        # Паттерн для формата: число, потом минус, потом коэффициент и x
+        pattern = r'^([+-]?\d+)-(\d*)x(.*)'
+        match = re.match(pattern, left_part)
+
+        if match:
+            b_str = match.group(1)
+            a_str = match.group(2)
+            rest = match.group(3) or ''
+
+            b = int(b_str)
+            a = int(a_str) if a_str else 1  # если коэффициент не указан, значит это 1
+
+            # Преобразуем в формат -ax + b
+            if a == 1:
+                normalized_left = f"-x"
+            else:
+                normalized_left = f"-{a}x"
+
+            # Добавляем b
+            if b != 0:
+                if b > 0:
+                    normalized_left += f" + {b}"
+                else:
+                    normalized_left += f" {b}"  # b уже отрицательное
+
+            # Добавляем остаток если есть
+            normalized_left += rest
+
+            return f"{normalized_left} = {right_part}"
+
+        return equation
+
     def find_coefficients(self, equation: str, eq_type: str) -> List[int]:
         """Находит коэффициенты уравнения"""
-        # Убираем пробелы и "= 0"
-        clean_eq = equation.replace(' ', '').replace('=0', '')
+        # Для линейных уравнений сначала нормализуем формат
+        if eq_type == 'linear':
+            equation = self.normalize_linear_equation_format(equation)
+
+        # Убираем пробелы
+        clean_eq = equation.replace(' ', '')
         coefficients = {'a': 0, 'b': 0, 'c': 0, 'd': 0}
+
         for pattern, coeff_name in self.equation_types[eq_type]['patterns']:
             match = re.search(pattern, clean_eq)
             if match:
@@ -126,8 +194,16 @@ class MyMath:
                     coefficients[coeff_name] = -1
                 else:
                     coefficients[coeff_name] = int(coeff_str)
-        return [coefficients['a'], coefficients['b'], coefficients['c']] if eq_type != 'irrational' else [
-            coefficients['a'], coefficients['b'], coefficients['c'], coefficients['d']]
+
+        if eq_type == 'linear':
+            return [coefficients['a'], coefficients['b'], coefficients['c']]
+        elif eq_type in ['quadratic', 'biquadratic']:
+            return [coefficients['a'], coefficients['b'], coefficients['c']]
+        else:  # irrational
+            return [coefficients['a'], coefficients['b'], coefficients['c'], coefficients['d']]
+
+    def find_coofs_linear_equation(self, equation: str) -> List[int]:
+        return self.find_coefficients(equation, 'linear')
 
     def find_coofs_quadratic_equation(self, equation: str) -> List[int]:
         return self.find_coefficients(equation, 'quadratic')
@@ -152,7 +228,7 @@ class MyMath:
 
     def process_root(self, root: float) -> float:
         """Обрабатывает и округляет корень"""
-        return int(root) if root.is_integer() else float(root) if math.isfinite(root) else round(root, 2)
+        return int(root) if root.is_integer() else round(root, 2) if len(str(root)) > 10 else float(root)
 
     def solve_quadratic_equation(self, a: int, b: int, c: int) -> List[float]:
         """Решает квадратное уравнение и возвращает корни"""
@@ -167,6 +243,12 @@ class MyMath:
                 (-b + d ** 0.5) / (2 * a)
             ]
             return sorted([self.process_root(r) for r in roots])
+
+    def answer_linear_equation(self, linear_equation: str) -> str:
+        """Находит корень линейного уравнения ax + b = c"""
+        a, b, c = self.find_coofs_linear_equation(linear_equation)
+        x = (c - b) / a
+        return str(self.process_root(x))
 
     def answer_quadratic_equation(self, quadratic_equation: str) -> str:
         """Находит корни квадратного уравнения"""
@@ -225,12 +307,49 @@ class MyMath:
             str(int(x)) if x.is_integer() else str(round(x, 2)) if len(str(x)) > 10 else str(x) for x in
             list(map(float, ans))) if ans else 'Корней нет'
 
-    def answer_linear_inequation(self):
-        pass
+    def answer_linear_inequation(self, task) -> str:
+        """Находит решение линейного неравенства"""
+        brackets = task.replace(' > 0', '').replace(' < 0', '').replace(' ≤ 0', '').replace(' ≥ 0', '')[1:-1].split(
+            ')(')
+        symbol = task.split()[-2]
+
+        linear_answers = []  # список значений x - нулей каждой скобки
+        negative_count = 0  # считаем скобки в которых нужно поменять знак
+        intervals = []  # список всех интервалов
+
+        for bracket in brackets:
+            linear_temp = bracket + ' = 0'
+            if ex.find_coofs_linear_equation(bracket)[0] < 0:
+                negative_count += 1
+            answer_temp = self.answer_linear_equation(linear_temp)
+            linear_answers.append(answer_temp.rstrip('.0'))
+        linear_answers.sort()
+
+        # если знак неравенства нестрогий, то скобки квадратные, иначе круглые
+        interval_brackets = ('[', ']') if '≥' in task or '≤' in task else ('(', ')')
+
+        intervals.append(f'(-∞;{linear_answers[0]}{interval_brackets[1]}')
+        for i in range(3):
+            intervals.append(f'{interval_brackets[0]}{linear_answers[i]};{linear_answers[i + 1]}{interval_brackets[1]}')
+        intervals.append(f'{interval_brackets[0]}{linear_answers[-1]};+∞)')
+
+        # если кол-во скобок, требующих замены знака - нечетное, то поменять знак неравенства на противоположный
+        if negative_count % 2 == 1:
+            symbol = self.symbols_change[symbol]
+
+        if all(map(lambda x: linear_answers.count(x) == 1, linear_answers)):
+            if symbol == '<' or symbol == '≤':
+                return ' ∪ '.join([intervals[1], intervals[3]])
+            else:
+                return ' ∪ '.join([intervals[0], intervals[2], intervals[4]])
+        else:
+            pass
 
     def check_answer(self, task: str, user_answer: str, eq_type: str) -> List:
         """Проверяет ответ для уравнения"""
-        if eq_type == 'quadratic':
+        if eq_type == 'linear':
+            correct_answer = self.answer_linear_equation(task).rstrip('.0')
+        elif eq_type == 'quadratic':
             correct_answer = self.answer_quadratic_equation(task).rstrip('.0')
         elif eq_type == 'biquadratic':
             correct_answer = self.answer_biquadratic_equation(task).rstrip('.0')
@@ -242,6 +361,9 @@ class MyMath:
                    else "Неверно. Проверьте расчёты и попробуйте еще раз.")
         return [message, is_correct, eq_type]
 
+    def check_answer_linear_equation(self, task: str, user_answer: str) -> List:
+        return self.check_answer(task, user_answer, 'linear')
+
     def check_answer_quadratic_equation(self, task: str, user_answer: str) -> List:
         return self.check_answer(task, user_answer, 'quadratic')
 
@@ -250,62 +372,6 @@ class MyMath:
 
     def check_answer_irrational_equation(self, task: str, user_answer: str) -> List:
         return self.check_answer(task, user_answer, 'irrational')
-
-    def generate_linear_equation(self) -> str:
-        """Генерирует линейное уравнение"""
-        a, b, c, d = self.generate_random_numbers()
-
-        left_side = self.format_equation_term(a, 'x', True)
-        left_side += self.format_equation_term(b)
-
-        return f"{left_side} = {c}"
-
-    def get_coofs_linear_equation(self, task: str) -> List[int]:
-        """Находит коэффициенты линейного уравнения"""
-        equation = task.replace(" ", "")
-
-        pattern = r'([+-]?\d*)x?([+-]\d+)?=([+-]?\d+)'
-
-        match = re.search(pattern, equation)
-
-        a_str, b_str, c_str = match.groups()
-
-        # Обработка коэффициента a
-        if a_str == "" or a_str == "+":
-            a = 1
-        elif a_str == "-":
-            a = -1
-        else:
-            a = int(a_str)
-
-        # Обработка коэффициента b
-        if b_str is None:
-            b = 0
-        else:
-            b = int(b_str)
-
-        # Обработка коэффициента c
-        c = int(c_str)
-
-        return [a, b, c]
-
-    def answer_linear_equation(self, linear_equation: str) -> str:
-        """Находит корень линейного уравнения"""
-        a, b, c = self.get_coofs_linear_equation(linear_equation)
-        x = (c - b) / a
-        return str(int(x) if x.is_integer() else round(x, 2) if len(str(x)) > 10 else x)
-
-    def check_answer_linear_equation(self, task: str, user_answer: str) -> List:
-        """Проверяет ответ для линейного уравнения"""
-        correct_answer = self.answer_linear_equation(task)
-
-        user_ans = str(user_answer).strip().rstrip('.0')
-        correct_ans = correct_answer.rstrip('.0')
-
-        is_correct = str(user_ans).strip() == correct_ans
-
-        message = "Верно. Продолжайте в том же духе." if is_correct else "Неверно. Проверьте расчеты и попробуйте позже."
-        return [message, is_correct, 'linear_equation']
 
     def parse_numbers(self, task: str) -> List[float]:
         """Парсит числа из строки задачи"""
@@ -438,4 +504,6 @@ class MyMath:
 
 
 ex = MyMath()
-print(ex.generate_linear_inequation())
+task = ex.generate_linear_inequation()
+print(task)
+print(ex.answer_linear_inequation(task))

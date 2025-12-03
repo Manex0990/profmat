@@ -307,6 +307,17 @@ class MyMath:
             str(int(x)) if x.is_integer() else str(round(x, 2)) if len(str(x)) > 10 else str(x) for x in
             list(map(float, ans))) if ans else 'Корней нет'
 
+    def determine_sign(self, expression_coeffs, x_value, symbol):
+        """Анализ знака неравенства при определенном значении x"""
+        symbol = -1 if symbol == '<' or symbol == '≤' else 1
+        total_sign = 1
+        for a, b in expression_coeffs:
+            value = a * x_value + b
+            sign = 1 if value > 0 else -1
+            total_sign *= sign
+
+        return total_sign == symbol  # 1 - знак совпадает, промежуток идет в ответ, 0 - не совпадает и не идет в ответ
+
     def answer_linear_inequation(self, task) -> str:
         """Находит решение линейного неравенства"""
         brackets = task.replace(' > 0', '').replace(' < 0', '').replace(' ≤ 0', '').replace(' ≥ 0', '')[1:-1].split(
@@ -314,36 +325,34 @@ class MyMath:
         symbol = task.split()[-2]
 
         linear_answers = []  # список значений x - нулей каждой скобки
-        negative_count = 0  # считаем скобки в которых нужно поменять знак
         intervals = []  # список всех интервалов
+        coeffs = []
 
         for bracket in brackets:
             linear_temp = bracket + ' = 0'
-            if ex.find_coofs_linear_equation(bracket)[0] < 0:
-                negative_count += 1
+            bracket_coeffs = ex.find_coofs_linear_equation(linear_temp)
+            coeffs.append(tuple(bracket_coeffs[:-1]))
             answer_temp = self.answer_linear_equation(linear_temp)
             linear_answers.append(answer_temp.rstrip('.0'))
-        linear_answers.sort()
+        linear_answers = sorted(linear_answers, key=lambda x: float(x))
 
         # если знак неравенства нестрогий, то скобки квадратные, иначе круглые
         interval_brackets = ('[', ']') if '≥' in task or '≤' in task else ('(', ')')
 
-        intervals.append(f'(-∞;{linear_answers[0]}{interval_brackets[1]}')
+        # форматируем строковые представления интервалов
+        if self.determine_sign(coeffs, float(linear_answers[0]) - 1, symbol):
+            intervals.append(f'(-∞;{linear_answers[0]}{interval_brackets[1]}')  # (-∞;a)
         for i in range(3):
-            intervals.append(f'{interval_brackets[0]}{linear_answers[i]};{linear_answers[i + 1]}{interval_brackets[1]}')
-        intervals.append(f'{interval_brackets[0]}{linear_answers[-1]};+∞)')
+            if self.determine_sign(coeffs, (float(linear_answers[i]) + float(linear_answers[i + 1])) / 2, symbol) and \
+                    linear_answers[i] != linear_answers[i + 1]:  # промежутки по типу (2;2) не берем
+                intervals.append(
+                    f'{interval_brackets[0]}{linear_answers[i]};{linear_answers[i + 1]}{interval_brackets[1]}')  # (a;b)
+        if self.determine_sign(coeffs, float(linear_answers[-1]) + 1, symbol):
+            intervals.append(f'{interval_brackets[0]}{linear_answers[-1]};+∞)')  # (а;+∞)
+        if not len(intervals):
+            return 'Корней нет'
 
-        # если кол-во скобок, требующих замены знака - нечетное, то поменять знак неравенства на противоположный
-        if negative_count % 2 == 1:
-            symbol = self.symbols_change[symbol]
-
-        if all(map(lambda x: linear_answers.count(x) == 1, linear_answers)):
-            if symbol == '<' or symbol == '≤':
-                return ' ∪ '.join([intervals[1], intervals[3]])
-            else:
-                return ' ∪ '.join([intervals[0], intervals[2], intervals[4]])
-        else:
-            pass
+        return ' ∪ '.join(intervals)
 
     def check_answer(self, task: str, user_answer: str, eq_type: str) -> List:
         """Проверяет ответ для уравнения"""
@@ -504,6 +513,6 @@ class MyMath:
 
 
 ex = MyMath()
-task = ex.generate_linear_inequation()
+task = '(5x + 9)(4x + 8)(3x + 6)(6 - 4x) ≤ 0'
 print(task)
 print(ex.answer_linear_inequation(task))

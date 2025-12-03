@@ -359,27 +359,29 @@ class MyMath:
             intervals.append(f'{interval_brackets[0]}{linear_answers[-1]};+∞)')  # (а;+∞)
 
         result = ' ∪ '.join(intervals)
+        result_copy = result
 
         # совмещаем интервалы вида (-∞;-2] ∪ [-2;-1.8] в (-∞;-1.8]
-        pattern = r'-?\d+(?:\.\d+)?] ∪ \[-?\d+(?:\.\d+)?;'
-        match = re.search(pattern, result)
-        if match:
-            temp = match.group(0)
-            temp = temp.replace(';', '').split('] ∪ [')
-            if temp[0] == temp[1]:
-                result = result.replace(match.group(0), '')
+        pattern = r'-?\d+(?:\.\d+)?\] ∪ \[-?\d+(?:\.\d+)?;'
+        matches = re.findall(pattern, result)
+        if matches:
+            for match in matches:
+                temp = match.replace(';', '').split('] ∪ [')
+                if temp[0] == temp[1]:
+                    result = result.replace(match, '')
 
         # Проверяем отдельные точки (корни)
         if symbol == '≥' or symbol == '≤':
-            single_zeros = self.get_single_zeros(result, linear_answers)
-            if result == '':
-                return ' ∪ '.join(single_zeros)
-            else:
-                for zero in single_zeros:
-                    result += f' ∪ {{{zero}}}'
+            single_zeros = self.get_single_zeros(result_copy, linear_answers)
+            if single_zeros:
+                if result == '':
+                    return f'{{{'; '.join(single_zeros)}}}'
+                else:
+                    result += f' ∪ {{{'; '.join(single_zeros)}}}'
+
+        # Возвращаем ответ
         if not len(result):
             return 'Корней нет'
-
         return result
 
     def check_answer(self, task: str, user_answer: str, eq_type: str) -> List:
@@ -390,10 +392,12 @@ class MyMath:
             correct_answer = self.answer_quadratic_equation(task).rstrip('.0')
         elif eq_type == 'biquadratic':
             correct_answer = self.answer_biquadratic_equation(task).rstrip('.0')
-        else:
+        elif eq_type == 'irrational':
             correct_answer = self.answer_irrational_equation(task).rstrip('.0')
+        else:
+            correct_answer = self.answer_linear_inequation(task)
         user_ans = str(user_answer).strip().rstrip('.0')
-        is_correct = str(user_ans).strip() == correct_answer
+        is_correct = str(user_ans) == correct_answer
         message = ("Верно. Продолжайте в том же духе." if is_correct
                    else "Неверно. Проверьте расчёты и попробуйте еще раз.")
         return [message, is_correct, eq_type]
@@ -409,6 +413,9 @@ class MyMath:
 
     def check_answer_irrational_equation(self, task: str, user_answer: str) -> List:
         return self.check_answer(task, user_answer, 'irrational')
+
+    def check_answer_linear_inequation(self, task: str, user_answer: str) -> List:
+        return self.check_answer(task, user_answer, 'linear_inequation')
 
     def parse_numbers(self, task: str) -> List[float]:
         """Парсит числа из строки задачи"""
@@ -542,6 +549,7 @@ class MyMath:
 
 ex = MyMath()
 for i in range(100):
-    task = ex.generate_linear_inequation()
+    task = '(7x + 6)(8x - 9)(5x - 6)(1 - 3x) < 0'
     print(task)
     print(ex.answer_linear_inequation(task))
+    print()

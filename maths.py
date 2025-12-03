@@ -307,7 +307,7 @@ class MyMath:
             str(int(x)) if x.is_integer() else str(round(x, 2)) if len(str(x)) > 10 else str(x) for x in
             list(map(float, ans))) if ans else 'Корней нет'
 
-    def determine_sign(self, expression_coeffs, x_value, symbol):
+    def determine_sign(self, expression_coeffs: List[float], x_value: float, symbol: str) -> bool:
         """Анализ знака неравенства при определенном значении x"""
         symbol = -1 if symbol == '<' or symbol == '≤' else 1
         total_sign = 1
@@ -318,7 +318,15 @@ class MyMath:
 
         return total_sign == symbol  # 1 - знак совпадает, промежуток идет в ответ, 0 - не совпадает и не идет в ответ
 
-    def answer_linear_inequation(self, task) -> str:
+    def get_single_zeros(self, temp_solution: str, zeros: List[str]) -> List:
+        """Находит отдельные точки удовлетворяющие неравенству, но не входящие в интервалы промежуточного решения"""
+        single_zeros = []
+        for zero in zeros:
+            if zero not in temp_solution and zero not in single_zeros:
+                single_zeros.append(zero)
+        return sorted(single_zeros, key=lambda x: float(x))
+
+    def answer_linear_inequation(self, task: str) -> str:
         """Находит решение линейного неравенства"""
         brackets = task.replace(' > 0', '').replace(' < 0', '').replace(' ≤ 0', '').replace(' ≥ 0', '')[1:-1].split(
             ')(')
@@ -349,10 +357,30 @@ class MyMath:
                     f'{interval_brackets[0]}{linear_answers[i]};{linear_answers[i + 1]}{interval_brackets[1]}')  # (a;b)
         if self.determine_sign(coeffs, float(linear_answers[-1]) + 1, symbol):
             intervals.append(f'{interval_brackets[0]}{linear_answers[-1]};+∞)')  # (а;+∞)
-        if not len(intervals):
+
+        result = ' ∪ '.join(intervals)
+
+        # совмещаем интервалы вида (-∞;-2] ∪ [-2;-1.8] в (-∞;-1.8]
+        pattern = r'-?\d+(?:\.\d+)?] ∪ \[-?\d+(?:\.\d+)?;'
+        match = re.search(pattern, result)
+        if match:
+            temp = match.group(0)
+            temp = temp.replace(';', '').split('] ∪ [')
+            if temp[0] == temp[1]:
+                result = result.replace(match.group(0), '')
+
+        # Проверяем отдельные точки (корни)
+        if symbol == '≥' or symbol == '≤':
+            single_zeros = self.get_single_zeros(result, linear_answers)
+            if result == '':
+                return ' ∪ '.join(single_zeros)
+            else:
+                for zero in single_zeros:
+                    result += f' ∪ {{{zero}}}'
+        if not len(result):
             return 'Корней нет'
 
-        return ' ∪ '.join(intervals)
+        return result
 
     def check_answer(self, task: str, user_answer: str, eq_type: str) -> List:
         """Проверяет ответ для уравнения"""
@@ -513,6 +541,7 @@ class MyMath:
 
 
 ex = MyMath()
-task = '(5x + 9)(4x + 8)(3x + 6)(6 - 4x) ≤ 0'
-print(task)
-print(ex.answer_linear_inequation(task))
+for i in range(100):
+    task = ex.generate_linear_inequation()
+    print(task)
+    print(ex.answer_linear_inequation(task))

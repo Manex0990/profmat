@@ -23,6 +23,48 @@ def calculate_and_round_roots(root_str):
         return root_str
 
 
+def get_linear_inequality_solution_simple(self, task):
+    """
+    Функция для получения пошагового решения линейного неравенства методом интервалов
+    """
+    steps = []
+
+    # Шаг 1: Анализ вида неравенства
+    steps.append('1. Анализ вида неравенства:')
+    inequality_symbol = task.split()[-2]
+    expression = task.replace(' > 0', '').replace(' < 0', '').replace(' ≥ 0', '').replace(' ≤ 0', '')
+
+    if ' ≥ ' in task or ' ≤ ' in task:
+        steps.append(f'   Неравенство нестрогое (знак {inequality_symbol})')
+    else:
+        steps.append(f'   Неравенство строгое (знак {inequality_symbol})')
+
+    steps.append(f'   Исходное выражение: {expression}')
+
+    # Шаг 2: Находим нули
+    steps.append('\n2. Находим нули каждого множителя:')
+    brackets = expression[1:-1].split(')(')
+
+    for i, bracket in enumerate(brackets):
+        linear_eq = bracket + ' = 0'
+        root_str = self.answer_linear_equation(linear_eq)
+        steps.append(f'   {bracket} = 0 → {root_str}')
+
+    # Шаг 3: Метод интервалов
+    steps.append('\n3. Применяем метод интервалов:')
+    steps.append('   - Расставляем нули на числовой прямой')
+    steps.append('   - Определяем знак выражения на каждом интервале')
+    steps.append('   - Выбираем интервалы, удовлетворяющие неравенству')
+
+    # Шаг 4: Получаем готовый ответ
+    steps.append('\n4. Получаем решение:')
+    final_answer = self.answer_linear_inequation(task)
+    steps.append(f'   {final_answer}')
+
+    steps.append(f'\nОтвет: {final_answer}')
+    return steps, final_answer
+
+
 def get_biquadratic_solution(task):
     """
     Функция для получения пошагового решения биквадратного уравнения

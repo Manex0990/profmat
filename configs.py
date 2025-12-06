@@ -1,6 +1,7 @@
 from maths import MyMath
 
 ex = MyMath()
+secret_key = 'profmat_pet_project_2026_key'
 
 
 # Функция для вычисления и округления корней

@@ -10,10 +10,10 @@ from form.task import TaskForm
 from sqlalchemy.orm import joinedload
 from werkzeug.utils import secure_filename
 import os
-from configs import TASK_CONFIG, OPERATIONS_CONFIG, route_mapping, ex
+from configs import TASK_CONFIG, OPERATIONS_CONFIG, route_mapping, ex, secret_key
 
 app = Flask(__name__, static_folder='static')
-app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+app.config['SECRET_KEY'] = secret_key
 
 login_manager = LoginManager()
 login_manager.init_app(app)

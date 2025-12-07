@@ -38,9 +38,9 @@ class MyMath:
                                '≥': '≤'}
 
     def generate_random_numbers(self) -> List[int]:
-        # два разные множества чисел введены для того, чтобы иррациональные уравнения чаще имели действительные решения
+        # два разные множества чисел введены для того, чтобы уравнения чаще имели действительные решения
         nums_range_1 = list(itertools.chain(range(-9, 0), range(1, 10)))  # диапазон целых чисел от -9 до 9, не включая 0
-        nums_range_2 = list(itertools.chain(range(-6, 0), range(1, 7)))  # диапазон целых чисел от -6 до 6, не включая 0
+        nums_range_2 = list(itertools.chain(range(-5, 0), range(1, 6)))  # диапазон целых чисел от -5 до 5, не включая 0
         a = choice(nums_range_1)
         b = choice(nums_range_1)
         c = choice(nums_range_2)

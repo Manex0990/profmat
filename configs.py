@@ -377,7 +377,7 @@ def get_irrational_solution(task):
                         f'   Корень x = {root} > {definition} ⇒ не удовлетворяет условию неотрицательности правой части уравнения')
         # Шаг 8: Формирование окончательного ответа
         steps.append('8. Окончательный результат:')
-        if ex.answer_irrational_equation(task) != 0.0:
+        if ex.answer_irrational_equation(task) != '0':
             final_answer = ex.answer_irrational_equation(task).rstrip('.0')
         else:
             final_answer = '0'

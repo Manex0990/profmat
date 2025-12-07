@@ -23,7 +23,7 @@ def calculate_and_round_roots(root_str):
         return root_str
 
 
-def get_linear_inequality_solution_simple(self, task):
+def get_linear_inequality_solution(task):
     """
     Функция для получения пошагового решения линейного неравенства методом интервалов
     """
@@ -33,6 +33,7 @@ def get_linear_inequality_solution_simple(self, task):
     steps.append('1. Анализ вида неравенства:')
     inequality_symbol = task.split()[-2]
     expression = task.replace(' > 0', '').replace(' < 0', '').replace(' ≥ 0', '').replace(' ≤ 0', '')
+    brackets = expression[1:-1].split(')(')
 
     if ' ≥ ' in task or ' ≤ ' in task:
         steps.append(f'   Неравенство нестрогое (знак {inequality_symbol})')
@@ -41,28 +42,63 @@ def get_linear_inequality_solution_simple(self, task):
 
     steps.append(f'   Исходное выражение: {expression}')
 
-    # Шаг 2: Находим нули
-    steps.append('\n2. Находим нули каждого множителя:')
-    brackets = expression[1:-1].split(')(')
+    sign_change_map = {'>': '<', '<': '>', '≥': '≤', '≤': '≥'}
 
-    for i, bracket in enumerate(brackets):
+    # Шаг 2: Преобразования скобок
+    steps.append("\n2. Преобразуем скобки:")
+    temp = task
+
+    for i, bracket in enumerate(brackets, 1):
+        # Проверяем скобки вида (a - bx)
+        if ' - ' in bracket and 'x' in bracket.split(' - ')[1]:
+            a_part, bx_part = bracket.split(' - ')
+            a = a_part[1:] if a_part.startswith('(') else a_part
+            bx = bx_part[:-1] if bx_part.endswith(')') else bx_part
+
+            if 'x' in bx:
+                b = bx.replace('x', '').strip()
+                b = '1' if b == '' else b
+                transformed = f'({b}x - {a})'
+                current_symbol = temp.split()[-2]
+                new_symbol = sign_change_map[current_symbol]
+                expression = temp.replace(' > 0', '').replace(' < 0', '').replace(' ≥ 0', '').replace(' ≤ 0', '')
+
+                steps.append(f"{i}) {bracket} → выносим минус: = -{transformed}")
+                steps.append('Домножим обе части неравенства на -1, чтоб избавиться от минуса за скобками.')
+                steps.append('Знак неравенства изменится на противоположный.')
+                new_expression = expression.replace(bracket, transformed[1:-1])
+                temp = new_expression + f' {new_symbol} ' + '0'
+                steps.append(f"Получим: {temp}")
+            else:
+                steps.append(f"{i}. {bracket} — стандартный вид")
+        else:
+            steps.append(f"{i}) {bracket} — стандартный вид, ничего не меняем")
+
+    steps.append(f'Итоговое неравенство: {temp}')
+
+    # Шаг 3: Находим нули
+    steps.append('\n3. Находим нули каждого множителя:')
+
+    new_brackets = new_expression[1:-1].split(')(')
+
+    for i, bracket in enumerate(new_brackets):
         linear_eq = bracket + ' = 0'
-        root_str = self.answer_linear_equation(linear_eq)
+        root_str = ex.answer_linear_equation(linear_eq)
         steps.append(f'   {bracket} = 0 → {root_str}')
 
-    # Шаг 3: Метод интервалов
-    steps.append('\n3. Применяем метод интервалов:')
+    # Шаг 4: Метод интервалов
+    steps.append('\n4. Применяем метод интервалов:')
     steps.append('   - Расставляем нули на числовой прямой')
     steps.append('   - Определяем знак выражения на каждом интервале')
     steps.append('   - Выбираем интервалы, удовлетворяющие неравенству')
 
-    # Шаг 4: Получаем готовый ответ
-    steps.append('\n4. Получаем решение:')
-    final_answer = self.answer_linear_inequation(task)
+    # Шаг 5: Получаем готовый ответ
+    steps.append('\n5. Получаем решение:')
+    final_answer = ex.answer_linear_inequation(task)
     steps.append(f'   {final_answer}')
 
     steps.append(f'\nОтвет: {final_answer}')
-    return steps, final_answer
+    return steps
 
 
 def get_biquadratic_solution(task):
@@ -355,7 +391,12 @@ def get_irrational_solution(task):
     return steps
 
 
-TASK_CONFIG = {'irrational_equation': {'name': 'Иррациональное уравнение',
+TASK_CONFIG = {'linear_inequation': {'name': 'Линейное неравенство. Метод интервалов',
+                                     'generate_func': ex.generate_linear_inequation,
+                                     'check_func': ex.check_answer_linear_inequation,
+                                     'points': 50,
+                                     'get_solution': lambda task: get_linear_inequality_solution(task)},
+               'irrational_equation': {'name': 'Иррациональное уравнение',
                                        'generate_func': ex.generate_irrational_equation,
                                        'check_func': ex.check_answer_irrational_equation,
                                        'points': 40,
@@ -394,7 +435,7 @@ TASK_CONFIG = {'irrational_equation': {'name': 'Иррациональное у�
                'linear_equation': {'name': 'Линейное уравнение',
                                    'generate_func': ex.generate_linear_equation,
                                    'check_func': ex.check_answer_linear_equation,
-                                   'points': 15,
+                                   'points': 10,
                                    'get_solution': lambda task:
                                    ['Для того, чтобы решить линейное уравнение нужно все коэффициенты с "х"',
                                     'перенести в одну часть уравнения, а остальные в другую.',
@@ -411,4 +452,5 @@ OPERATIONS_CONFIG = {'sum': {'sum': 'сложим', 'name': 'Пример на �
 route_mapping = {'linear_equation': 'open_task_linear_equation',
                  'quadratic_equation': 'open_task_quadratic_equation',
                  'biquadratic_equation': 'open_task_biquadratic_equation',
-                 'irrational_equation': 'open_task_irrational_equation'}
+                 'irrational_equation': 'open_task_irrational_equation',
+                 'linear_inequation': 'open_task_linear_inequation'}

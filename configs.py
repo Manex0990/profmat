@@ -55,22 +55,18 @@ def get_linear_inequality_solution(task):
             a = a_part[1:] if a_part.startswith('(') else a_part
             bx = bx_part[:-1] if bx_part.endswith(')') else bx_part
 
-            if 'x' in bx:
-                b = bx.replace('x', '').strip()
-                b = '1' if b == '' else b
-                transformed = f'({b}x - {a})'
-                current_symbol = temp.split()[-2]
-                new_symbol = sign_change_map[current_symbol]
-                expression = temp.replace(' > 0', '').replace(' < 0', '').replace(' ≥ 0', '').replace(' ≤ 0', '')
-
-                steps.append(f"{i}) {bracket} → выносим минус: = -{transformed}")
-                steps.append('Домножим обе части неравенства на -1, чтоб избавиться от минуса за скобками.')
-                steps.append('Знак неравенства изменится на противоположный.')
-                new_expression = expression.replace(bracket, transformed[1:-1])
-                temp = new_expression + f' {new_symbol} ' + '0'
-                steps.append(f"Получим: {temp}")
-            else:
-                steps.append(f"{i}. {bracket} — стандартный вид")
+            b = bx.replace('x', '').strip()
+            b = '1' if b == '' else b
+            transformed = f'({b}x - {a})'
+            current_symbol = temp.split()[-2]
+            new_symbol = sign_change_map[current_symbol]
+            expression = temp.replace(' > 0', '').replace(' < 0', '').replace(' ≥ 0', '').replace(' ≤ 0', '')
+            steps.append(f"{i}) {bracket} → выносим минус: = -{transformed}")
+            steps.append('Домножим обе части неравенства на -1, чтоб избавиться от минуса за скобками.')
+            steps.append('Знак неравенства изменится на противоположный.')
+            new_expression = expression.replace(bracket, transformed[1:-1])
+            temp = new_expression + f' {new_symbol} ' + '0'
+            steps.append(f"Получим: {temp}")
         else:
             steps.append(f"{i}) {bracket} — стандартный вид, ничего не меняем")
 

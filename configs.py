@@ -23,6 +23,15 @@ def calculate_and_round_roots(root_str):
         return root_str
 
 
+def determine_symbol_on_interval(coeffs, root):
+    total_sign = 1
+    for a, b in coeffs:
+        value = a * root + b
+        sign = 1 if value > 0 else -1
+        total_sign *= sign
+    return '+' if total_sign == 1 else '-'
+
+
 def get_linear_inequality_solution(task):
     """
     Функция для получения пошагового решения линейного неравенства методом интервалов
@@ -46,7 +55,14 @@ def get_linear_inequality_solution(task):
 
     # Шаг 2: Преобразования скобок
     steps.append("\n2. Преобразуем скобки:")
+    steps.append(
+        'Нужно привести все скобки к виду, где x со своим коэффициентом будет стоять вначале, а свободный коэффициент - в конце.')
+    steps.append(
+        'Для этого во всех скобках, где x стоит на последнем месте и коэффициент перед ним отрицательный,')
+    steps.append('вынесем минус за скобки и поменяем знаки в скобках, а также поменяем местами свободный коэффициент и x')
     temp = task
+    new_expression = expression
+    new_symbol = inequality_symbol
 
     for i, bracket in enumerate(brackets, 1):
         # Проверяем скобки вида (a - bx)
@@ -58,14 +74,14 @@ def get_linear_inequality_solution(task):
             b = bx.replace('x', '').strip()
             b = '1' if b == '' else b
             transformed = f'({b}x - {a})'
-            current_symbol = temp.split()[-2]
-            new_symbol = sign_change_map[current_symbol]
-            expression = temp.replace(' > 0', '').replace(' < 0', '').replace(' ≥ 0', '').replace(' ≤ 0', '')
+            current_symbol = temp.split()[-2]  # текущий знак неравенства
+            new_symbol = sign_change_map[current_symbol]  # противоположный знак, при умножении на -1
+            expression = temp.replace(' > 0', '').replace(' < 0', '').replace(' ≥ 0', '').replace(' ≤ 0', '')  # произведение скобок
             steps.append(f"{i}) {bracket} → выносим минус: = -{transformed}")
             steps.append('Домножим обе части неравенства на -1, чтоб избавиться от минуса за скобками.')
             steps.append('Знак неравенства изменится на противоположный.')
-            new_expression = expression.replace(bracket, transformed[1:-1])
-            temp = new_expression + f' {new_symbol} ' + '0'
+            new_expression = expression.replace(bracket, transformed[1:-1])  # заменяем скобку
+            temp = new_expression + f' {new_symbol} ' + '0'  # преобразованное неравенство с новым знаком и скобкой
             steps.append(f"Получим: {temp}")
         else:
             steps.append(f"{i}) {bracket} — стандартный вид, ничего не меняем")
@@ -77,15 +93,46 @@ def get_linear_inequality_solution(task):
 
     new_brackets = new_expression[1:-1].split(')(')
 
+    roots = set()
     for i, bracket in enumerate(new_brackets):
         linear_eq = bracket + ' = 0'
         root_str = ex.answer_linear_equation(linear_eq)
         steps.append(f'   {bracket} = 0 → {root_str}')
+        roots.add(root_str)
+    roots = sorted(list(roots), key=lambda x: float(x))
+    steps.append(f'   В порядке возрастания: {', '.join(roots)}')
 
     # Шаг 4: Метод интервалов
     steps.append('\n4. Применяем метод интервалов:')
     steps.append('   - Расставляем нули на числовой прямой')
     steps.append('   - Определяем знак выражения на каждом интервале')
+    coeffs = []
+    for bracket in new_brackets:
+        coeffs.append(tuple(ex.find_coofs_linear_equation(bracket + ' = 0'))[:-1])
+    symbols_list = []
+    for i in range(len(roots) + 1):
+        if i == 0:
+            symbols_list.append(determine_symbol_on_interval(coeffs, float(roots[i]) - 1))
+        elif i == len(roots):
+            symbols_list.append(determine_symbol_on_interval(coeffs, float(roots[i - 1]) + 1))
+        else:
+            symbols_list.append(determine_symbol_on_interval(coeffs, (float(roots[i - 1]) + float(roots[i])) / 2))
+    symbols = ' ' * 20
+    nums_line = ' ' * 10
+    nums = ''
+    for symbol in symbols_list:
+        symbols += f'{symbol}{' ' * 15}'
+    steps.append(symbols)
+    for root in roots:
+        nums_line += f'{'-' * 10}{'0' if new_symbol in ('<', '>') else '*'}'
+        if '0' in nums_line:
+            nums += f'{' ' * (10 - len(root) // 2)}{root}'
+        else:
+            nums += f'{' ' * (14 - len(root) // 2)}{root}'
+    nums_line += ('-' * 10 + '>' + 'x')
+    steps.append(nums_line)
+    steps.append(nums)
+
     steps.append('   - Выбираем интервалы, удовлетворяющие неравенству')
 
     # Шаг 5: Получаем готовый ответ

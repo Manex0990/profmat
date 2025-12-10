@@ -340,7 +340,7 @@ class MyMath:
 
         for bracket in brackets:
             linear_temp = bracket + ' = 0'
-            bracket_coeffs = ex.find_coofs_linear_equation(linear_temp)
+            bracket_coeffs = self.find_coofs_linear_equation(linear_temp)
             coeffs.append(tuple(bracket_coeffs[:-1]))
             answer_temp = self.answer_linear_equation(linear_temp)
             linear_answers.append(answer_temp.rstrip('.0'))
@@ -547,11 +547,3 @@ class MyMath:
 
     def generate_crop_stage_3(self) -> str:
         return self.generate_complex_operation(':', [(10, 40), (1, 8), (1, 6), (1, 4)], [True, False, False, True])
-
-
-ex = MyMath()
-for i in range(100):
-    task = '(7x + 6)(8x - 9)(5x - 6)(1 - 3x) < 0'
-    print(task)
-    print(ex.answer_linear_inequation(task))
-    print()

@@ -59,7 +59,8 @@ def get_linear_inequality_solution(task):
         'Нужно привести все скобки к виду, где x со своим коэффициентом будет стоять вначале, а свободный коэффициент - в конце.')
     steps.append(
         'Для этого во всех скобках, где x стоит на последнем месте и коэффициент перед ним отрицательный,')
-    steps.append('вынесем минус за скобки и поменяем знаки в скобках, а также поменяем местами свободный коэффициент и x')
+    steps.append(
+        'вынесем минус за скобки и поменяем знаки в скобках, а также поменяем местами свободный коэффициент и x')
     temp = task
     new_expression = expression
     new_symbol = inequality_symbol
@@ -76,7 +77,8 @@ def get_linear_inequality_solution(task):
             transformed = f'({b}x - {a})'
             current_symbol = temp.split()[-2]  # текущий знак неравенства
             new_symbol = sign_change_map[current_symbol]  # противоположный знак, при умножении на -1
-            expression = temp.replace(' > 0', '').replace(' < 0', '').replace(' ≥ 0', '').replace(' ≤ 0', '')  # произведение скобок
+            expression = temp.replace(' > 0', '').replace(' < 0', '').replace(' ≥ 0', '').replace(' ≤ 0',
+                                                                                                  '')  # произведение скобок
             steps.append(f"{i}) {bracket} → выносим минус: = -{transformed}")
             steps.append('Домножим обе части неравенства на -1, чтоб избавиться от минуса за скобками.')
             steps.append('Знак неравенства изменится на противоположный.')
@@ -364,8 +366,8 @@ def get_irrational_solution(task):
     steps.append('3. Возведем обе части уравнения в квадрат:')
     steps.append(f'   ({right_part})² = ({left_part})²')
     steps.append(f'   {under_root} = ({left_part})²')
-    steps.append(
-        '    Неотрицательность подкоренного выражения можно не проверять, так как оно равно квадрату некоторого выражения, а квадрат всегда ≥ 0')
+    steps.append('    Неотрицательность подкоренного выражения можно не проверять,')
+    steps.append('    так как оно равно квадрату некоторого выражения, а квадрат всегда ≥ 0')
 
     # Шаг 4: Раскрытие квадрата в правой части
     a_temp, b_temp, c_temp = c ** 2, 2 * c * d, d ** 2

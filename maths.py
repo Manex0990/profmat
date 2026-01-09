@@ -27,7 +27,16 @@ class MyMath:
                                         (r'=\s*([+-]?\d*)x', 'c'),  # x вне корня (правая часть уравнения)
                                         (r'=\s*[^=]*?([+-]?\d+)(?:\s*[^x]|$)', 'd')],
                            # свободный член вне корня (правая часть уравнения)
-                           'format_terms': ['x', '', 'x', '']}, }
+                           'format_terms': ['x', '', 'x', '']},
+            'module': {'patterns': [(r'\|[^|]*?([+-]?\d*(?=\s*x))x', 'a'),
+                                    # Коэффициент a перед x внутри модуля
+                                    (r'\|[^|]*?x\s*([+-]?\s*\d+)|^\|\s*([+-]?\d+)(?![^|]*x)', 'b'),
+                                    # Свободный член b внутри модуля
+                                    (r'=\s*[^|]*?([+-]?\d*(?=\s*x))x', 'c'),
+                                    # Коэффициент c перед x вне модуля (правая часть)
+                                    (r'=\s*[^|]*?(?:x\s*([+-]?\s*\d+)|([+-]?\d+)(?!\s*x))', 'd')
+                                    # Свободный член d вне модуля
+                                    ]}}
         self.OPERATIONS = {'s': sum,
                            'm': lambda nums: nums[0] - sum(nums[1:]),
                            'mul': lambda nums: self.product(nums),
@@ -39,7 +48,8 @@ class MyMath:
 
     def generate_random_numbers(self) -> List[int]:
         # два разные множества чисел введены для того, чтобы уравнения чаще имели действительные решения
-        nums_range_1 = list(itertools.chain(range(-9, 0), range(1, 10)))  # диапазон целых чисел от -9 до 9, не включая 0
+        nums_range_1 = list(
+            itertools.chain(range(-9, 0), range(1, 10)))  # диапазон целых чисел от -9 до 9, не включая 0
         nums_range_2 = list(itertools.chain(range(-5, 0), range(1, 6)))  # диапазон целых чисел от -5 до 5, не включая 0
         a = choice(nums_range_1)
         b = choice(nums_range_1)
@@ -105,21 +115,31 @@ class MyMath:
         return equation
 
     def generate_quadratic_equation(self) -> str:
+        """Генерирует квадратное уравнение вида ax² + bx + c = 0"""
         return self.generate_equation('quadratic')
 
     def generate_biquadratic_equation(self) -> str:
+        """Генерирует биквадратное уравнение вида ax⁴ + bx² + c = 0"""
         return self.generate_equation('biquadratic')
 
     def generate_irrational_equation(self) -> str:
+        """Генерирует иррациональное уравнение вида √(ax + b) = cx + d"""
         a, b, c, d = self.generate_random_numbers()
         terms = self.equation_types['irrational']['format_terms']
+
         left_side = self.format_equation_term(a, terms[0], True)
         left_side += self.format_equation_term(b, terms[1])
         right_side = self.format_equation_term(c, terms[2], True)
         right_side += self.format_equation_term(d, terms[3])
+
         return f'√({left_side}) = {right_side}'
 
+    def generate_module_equation(self) -> str:
+        """Генерирует уравнение с модулем вида |ax + b| = cx + d"""
+        return self.generate_irrational_equation().replace('√', '').replace('(', '|').replace(')', '|')
+
     def generate_linear_inequation(self) -> str:
+        """Генерирует линейное неравенство вида (ax + b)(cx + d)(ex + f)(gx + h) ><≥≤ 0"""
         a, b, c, d = self.generate_random_numbers()
         a_x, b_x, c_x, d_x = self.generate_random_numbers()
         terms = self.equation_types['linear_inequation']['format_terms']
@@ -216,6 +236,9 @@ class MyMath:
     def find_coofs_irrational_equation(self, equation: str) -> List[int]:
         return self.find_coefficients(equation, 'irrational')
 
+    def find_coofs_module_equation(self, equation: str) -> List[int]:
+        return self.find_coefficients(equation, 'module')
+
     def calculate_discriminant(self, a: int, b: int, c: int) -> float:
         """Вычисляет дискриминант"""
         return b ** 2 - 4 * a * c
@@ -247,7 +270,7 @@ class MyMath:
             return sorted([self.process_root(r) for r in roots])
 
     def answer_linear_equation(self, linear_equation: str) -> str:
-        """Находит корень линейного уравнения ax + b = c"""
+        """Находит корень линейного уравнения"""
         a, b, c = self.find_coofs_linear_equation(linear_equation)
         x = (c - b) / a
         return str(self.process_root(x))
@@ -288,8 +311,15 @@ class MyMath:
             str(int(x)) if x.is_integer() else str(round(x, 2)) if len(str(x)) > 10 else str(x) for x in
             processed_roots)
 
+    def check_routs_on_definition(self, routs: str, definition: float, c: int) -> List[float]:
+        ans = []
+        for route in list(map(float, routs.split())):
+            if (c > 0 and route >= definition) or (c < 0 and route <= definition):
+                ans.append(str(route))
+        return ans
+
     def answer_irrational_equation(self, irrational_equation: str) -> str:
-        """Находит корни биквадратного уравнения"""
+        """Находит корни иррационального уравнения"""
         a, b, c, d = self.find_coofs_irrational_equation(irrational_equation)
 
         # создаем вспомогательное уравнение и находим его корни
@@ -298,16 +328,45 @@ class MyMath:
         routs = self.answer_quadratic_equation(temp_eq)
         if routs == 'Корней нет':
             return 'Корней нет'
+        eq_definition = -d / c
 
         # проверяем корни по области определения
-        ans = []
-        eq_definition = -d / c
-        for route in list(map(float, routs.split())):
-            if (c > 0 and route >= eq_definition) or (c < 0 and route <= eq_definition):
-                ans.append(str(route))
+        ans = self.check_routs_on_definition(routs, eq_definition, c)
+
         return ' '.join(
             str(int(x)) if x.is_integer() else str(round(x, 2)) if len(str(x)) > 10 else str(x) for x in
             list(map(float, ans))) if ans else 'Корней нет'
+
+    def answer_module_equation(self, module_equation: str) -> str:
+        """Находит корни уравнения с модулем"""
+        a, b, c, d = self.find_coofs_module_equation(module_equation)
+        eq_definition = -d / c
+
+        # если коэффициенты при x и коэффициенты без x в обеих частях уравнения совпадают по модулю, решением будет область определения
+        if (a == c and b == d) or (a == -c and b == -d):
+            eq_definition = int(eq_definition) if eq_definition.is_integer() else round(eq_definition, 2) if len(str(eq_definition)) > 10 else eq_definition
+            if c > 0:
+                return f'[{eq_definition};+∞)'
+            else:
+                return f'(-∞;{eq_definition}]'
+
+        if (a == c and b > d) or (a == -c and d < -b):
+            return 'Корней нет'
+
+        # создаем вспомогательное уравнение и находим его корни
+        a_new, b_new, c_new = (c ** 2) - (a ** 2), (c * d * 2) - (a * b * 2), (d ** 2) - (b ** 2)
+        temp_eq = self.generate_equation('quadratic', [a_new, b_new, c_new])
+        routs = self.answer_quadratic_equation(temp_eq)
+        if routs == 'Корней нет':
+            return 'Корней нет'
+
+        # проверяем корни по области определения
+        ans = self.check_routs_on_definition(routs, eq_definition, c)
+
+        return ' '.join(
+            str(int(x)) if x.is_integer() else str(round(x, 2)) if len(str(x)) > 10 else str(x) for x in
+            list(map(float, ans))) if ans else 'Корней нет'
+
 
     def determine_sign(self, expression_coeffs: List[float], x_value: float, symbol: str) -> bool:
         """Анализ знака неравенства при определенном значении x"""
@@ -396,6 +455,8 @@ class MyMath:
             correct_answer = self.answer_biquadratic_equation(task).rstrip('.0')
         elif eq_type == 'irrational':
             correct_answer = self.answer_irrational_equation(task).rstrip('.0')
+        elif eq_type == 'module':
+            correct_answer = self.answer_module_equation(task).rstrip('.0')
         else:
             correct_answer = self.answer_linear_inequation(task)
         user_ans = str(user_answer).strip().rstrip('.0')
@@ -415,6 +476,9 @@ class MyMath:
 
     def check_answer_irrational_equation(self, task: str, user_answer: str) -> List:
         return self.check_answer(task, user_answer, 'irrational')
+
+    def check_answer_module_equation(self, task: str, user_answer: str) -> List:
+        return self.check_answer(task, user_answer, 'module')
 
     def check_answer_linear_inequation(self, task: str, user_answer: str) -> List:
         return self.check_answer(task, user_answer, 'linear_inequation')
@@ -547,3 +611,11 @@ class MyMath:
 
     def generate_crop_stage_3(self) -> str:
         return self.generate_complex_operation(':', [(10, 40), (1, 8), (1, 6), (1, 4)], [True, False, False, True])
+
+
+ex = MyMath()
+task = '|-3x - 1| = 3x - 1'
+print(task)
+print(ex.find_coofs_module_equation(task))
+print(ex.answer_module_equation(task))
+print(ex.check_answer_module_equation(task, ex.answer_module_equation(task)))

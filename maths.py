@@ -344,7 +344,8 @@ class MyMath:
 
         # если коэффициенты при x и коэффициенты без x в обеих частях уравнения совпадают по модулю, решением будет область определения
         if (a == c and b == d) or (a == -c and b == -d):
-            eq_definition = int(eq_definition) if eq_definition.is_integer() else round(eq_definition, 2) if len(str(eq_definition)) > 10 else eq_definition
+            eq_definition = int(eq_definition) if eq_definition.is_integer() else round(eq_definition, 2) if len(
+                str(eq_definition)) > 10 else eq_definition
             if c > 0:
                 return f'[{eq_definition};+∞)'
             else:
@@ -366,7 +367,6 @@ class MyMath:
         return ' '.join(
             str(int(x)) if x.is_integer() else str(round(x, 2)) if len(str(x)) > 10 else str(x) for x in
             list(map(float, ans))) if ans else 'Корней нет'
-
 
     def determine_sign(self, expression_coeffs: List[float], x_value: float, symbol: str) -> bool:
         """Анализ знака неравенства при определенном значении x"""
@@ -447,18 +447,20 @@ class MyMath:
 
     def check_answer(self, task: str, user_answer: str, eq_type: str) -> List:
         """Проверяет ответ для уравнения"""
-        if eq_type == 'linear':
-            correct_answer = self.answer_linear_equation(task).rstrip('.0')
-        elif eq_type == 'quadratic':
-            correct_answer = self.answer_quadratic_equation(task).rstrip('.0')
-        elif eq_type == 'biquadratic':
-            correct_answer = self.answer_biquadratic_equation(task).rstrip('.0')
-        elif eq_type == 'irrational':
-            correct_answer = self.answer_irrational_equation(task).rstrip('.0')
-        elif eq_type == 'module':
-            correct_answer = self.answer_module_equation(task).rstrip('.0')
-        else:
-            correct_answer = self.answer_linear_inequation(task)
+        match eq_type:
+            case 'linear':
+                correct_answer = self.answer_linear_equation(task).rstrip('.0')
+            case 'quadratic':
+                correct_answer = self.answer_quadratic_equation(task).rstrip('.0')
+            case 'biquadratic':
+                correct_answer = self.answer_biquadratic_equation(task).rstrip('.0')
+            case 'irrational':
+                correct_answer = self.answer_irrational_equation(task).rstrip('.0')
+            case 'module':
+                correct_answer = self.answer_module_equation(task).rstrip('.0')
+            case 'linear_inequation':
+                correct_answer = self.answer_linear_inequation(task).rstrip('.0')
+
         user_ans = str(user_answer).strip().rstrip('.0')
         is_correct = str(user_ans) == correct_answer
         message = ("Верно. Продолжайте в том же духе." if is_correct

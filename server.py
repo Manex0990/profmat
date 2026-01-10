@@ -128,6 +128,13 @@ def open_task_linear_inequation(group_id):
     return handle_task_request(group_id, 'linear_inequation', 'cur_task_linear_inequation', show_solution)
 
 
+@app.route('/student_groups/<int:group_id>/task/module_equation', methods=['GET', 'POST'])
+@login_required
+def open_task_module_equation(group_id):
+    show_solution = request.args.get('show_solution') == 'true'
+    return handle_task_request(group_id, 'module_equation', 'cur_task_module_equation', show_solution)
+
+
 @app.route('/student_groups/<int:group_id>/task/irrational_equation', methods=['GET', 'POST'])
 @login_required
 def open_task_irrational_equation(group_id):
@@ -179,6 +186,7 @@ def open_task_menu(group_id):
         res.set_cookie('cur_task_quadratic_equation', '', max_age=0)
         res.set_cookie('cur_task_linear_equation', '', max_age=0)
         res.set_cookie('cur_task_irrational_equation', '', max_age=0)
+        res.set_cookie('cur_task_module_equation', '', max_age=0)
         res.set_cookie('cur_task_linear_inequation', '', max_age=0)
         return res
     finally:

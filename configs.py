@@ -436,11 +436,104 @@ def get_irrational_solution(task):
     return steps
 
 
+def get_module_solution(task):
+    """
+    Упрощенная версия решения уравнения с модулем
+    """
+
+    steps = []
+
+    a, b, c, d = ex.find_coofs_module_equation(task)
+    definition = -d / c
+    definition = int(definition) if definition.is_integer() else round(definition, 2) if len(str(definition)) > 10 else definition
+
+    if (a == c and b == d) or (a == -c and b == -d):
+        steps.append('1. Заметим, что выражение под модулем и в правой части уравнения совпадают или отличаются только знаком')
+        steps.append('Значит решением будет являться область определения')
+        if c > 0:
+            steps.append(f'2. Ответ: [{definition};+∞)')
+        else:
+            steps.append(f'2. Ответ: (-∞;{definition}]')
+        return steps
+
+    if (a == c and b > d) or (a == -c and d < -b):
+        steps.append('1. Заметим, что коэффициенты при x совпадают, значит нужно сравнить свободные члены')
+        return '2. Ответ: Корней нет'
+
+    # Возводим в квадрат
+    left_part, right_part = task.split(' = ')
+    steps.append('1. Мы можем возвести обе части уравнения в квадрат при условии, что они не отрицательны.')
+    steps.append('2. Левая часть неотрицательна всегда, т.к. модуль не может быть отрицательным.')
+    steps.append(f'Для правой части запишем условие: {right_part} ≥ 0')
+    if c > 0:
+        steps.append(f'  3. Получим неравенство x ≥ {definition}')
+    else:
+        steps.append(f'  3. Получим неравенство x ≤ {definition}')
+    steps.append(f"\n4. Возводим в квадрат: ({left_part})² = ({right_part})²")
+
+    # Раскрываем квадраты
+    left = ex.generate_equation('quadratic', [a ** 2, 2 * a * b, b ** 2]).replace(' = 0', '')
+    right = ex.generate_equation('quadratic', [c ** 2, 2 * c * d, d ** 2]).replace(' = 0', '')
+    steps.append(f"Получаем {left} = {right}")
+
+    # Переносим всё влево
+    A = a * a - c * c
+    B = 2 * a * b - 2 * c * d
+    C = b * b - d * d
+
+    steps.append(f"\n5. Переносим всё влево:")
+    new = ex.generate_equation('quadratic', [A, B, C])
+    steps.append(new)
+    steps.append(f'D = {ex.find_discriminant(new)}')
+
+
+    # Решаем квадратное уравнение
+    solutions = ex.answer_quadratic_equation(new)
+    steps.append(f'6. Получаем корни: {solutions}')
+
+    # Проверяем корни
+    steps.append("\n7. Проверяем корни по ограничению:")
+    valid_solutions = ex.check_routs_on_definition(solutions, definition, c)
+
+    for root in list(map(float, solutions.split())):
+        if c > 0:
+            if root >= definition:
+                steps.append(
+                    f'   Корень x = {root} ≥ {definition} ⇒ удовлетворяет условию неотрицательности правой части уравнения')
+            else:
+                steps.append(
+                    f'   Корень x = {root} < {definition} ⇒ не удовлетворяет условию неотрицательности правой части уравнения')
+        elif c < 0:
+            if root <= definition:
+                steps.append(
+                    f'   Корень x = {root} ≤ {definition} ⇒ удовлетворяет условию неотрицательности правой части уравнения')
+            else:
+                steps.append(
+                    f'   Корень x = {root} > {definition} ⇒ не удовлетворяет условию неотрицательности правой части уравнения')
+
+    # Формируем ответ
+    steps.append("\n8. Итоговый ответ:")
+    if not len(valid_solutions):
+        steps.append("Уравнение не имеет решений")
+        answer = "Корней нет"
+    else:
+        answer = ' '.join(map(str, valid_solutions))
+
+    steps.append(f"\nОтвет: {answer.rstrip('.0')}")
+
+    return steps
+
+
 TASK_CONFIG = {'linear_inequation': {'name': 'Линейное неравенство. Метод интервалов',
                                      'generate_func': ex.generate_linear_inequation,
                                      'check_func': ex.check_answer_linear_inequation,
                                      'points': 50,
                                      'get_solution': lambda task: get_linear_inequality_solution(task)},
+               'module_equation': {'name': 'Уравнение с модулем',
+                                   'generate_func': ex.generate_module_equation,
+                                   'check_func': ex.check_answer_module_equation,
+                                   'points': 40,
+                                   'get_solution': lambda task: get_module_solution(task)},
                'irrational_equation': {'name': 'Иррациональное уравнение',
                                        'generate_func': ex.generate_irrational_equation,
                                        'check_func': ex.check_answer_irrational_equation,
@@ -498,4 +591,5 @@ route_mapping = {'linear_equation': 'open_task_linear_equation',
                  'quadratic_equation': 'open_task_quadratic_equation',
                  'biquadratic_equation': 'open_task_biquadratic_equation',
                  'irrational_equation': 'open_task_irrational_equation',
+                 'module_equation': 'open_task_module_equation',
                  'linear_inequation': 'open_task_linear_inequation'}

@@ -315,7 +315,7 @@ class MyMath:
         ans = []
         for route in list(map(float, routs.split())):
             if (c > 0 and route >= definition) or (c < 0 and route <= definition):
-                ans.append(str(route))
+                ans.append(route)
         return ans
 
     def answer_irrational_equation(self, irrational_equation: str) -> str:

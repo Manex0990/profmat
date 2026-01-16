@@ -445,10 +445,12 @@ def get_module_solution(task):
 
     a, b, c, d = ex.find_coofs_module_equation(task)
     definition = -d / c
-    definition = int(definition) if definition.is_integer() else round(definition, 2) if len(str(definition)) > 10 else definition
+    definition = int(definition) if definition.is_integer() else round(definition, 2) if len(
+        str(definition)) > 10 else definition
 
     if (a == c and b == d) or (a == -c and b == -d):
-        steps.append('1. Заметим, что выражение под модулем и в правой части уравнения совпадают или отличаются только знаком')
+        steps.append(
+            '1. Заметим, что выражение под модулем и в правой части уравнения совпадают или отличаются только знаком')
         steps.append('Значит решением будет являться область определения')
         if c > 0:
             steps.append(f'2. Ответ: [{definition};+∞)')
@@ -485,7 +487,6 @@ def get_module_solution(task):
     new = ex.generate_equation('quadratic', [A, B, C])
     steps.append(new)
     steps.append(f'D = {ex.find_discriminant(new)}')
-
 
     # Решаем квадратное уравнение
     solutions = ex.answer_quadratic_equation(new)
@@ -593,3 +594,24 @@ route_mapping = {'linear_equation': 'open_task_linear_equation',
                  'irrational_equation': 'open_task_irrational_equation',
                  'module_equation': 'open_task_module_equation',
                  'linear_inequation': 'open_task_linear_inequation'}
+
+task_type_names = {
+    'linear_equation': 'Линейное уравнение',
+    'quadratic_equation': 'Квадратное уравнение',
+    'biquadratic_equation': 'Биквадратное уравнение',
+    'irrational_equation': 'Иррациональное уравнение',
+    'module_equation': 'Уравнение с модулем',
+    'linear_inequation': 'Линейное неравенство',
+    'sum_1': 'Сложение (простой)',
+    'sum_2': 'Сложение (средний)',
+    'sum_3': 'Сложение (сложный)',
+    'min_1': 'Вычитание (простой)',
+    'min_2': 'Вычитание (средний)',
+    'min_3': 'Вычитание (сложный)',
+    'mul_1': 'Умножение (простой)',
+    'mul_2': 'Умножение (средний)',
+    'mul_3': 'Умножение (сложный)',
+    'crop_1': 'Деление (простой)',
+    'crop_2': 'Деление (средний)',
+    'crop_3': 'Деление (сложный)'
+}

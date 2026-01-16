@@ -11,7 +11,7 @@ from form.task import TaskForm
 from sqlalchemy.orm import joinedload
 from werkzeug.utils import secure_filename
 import os
-from configs import TASK_CONFIG, OPERATIONS_CONFIG, route_mapping, ex, secret_key
+from configs import TASK_CONFIG, OPERATIONS_CONFIG, route_mapping, ex, secret_key, task_type_names
 
 app = Flask(__name__, static_folder='static')
 app.config['SECRET_KEY'] = secret_key
@@ -130,7 +130,8 @@ def handle_task_request(group_id, task_key, cookie_name, show_solution=False, te
     verdict = config['check_func'](task, user_answer)
     message, is_correct, eq_type, correct_answer = verdict
     saw_solution = request.cookies.get('solution') == '1'
-    save_solution(group_id, current_user.id, task_key, task, user_answer, correct_answer, is_correct, config['points'],
+    save_solution(group_id, current_user.id, task_type_names[task_key], task, user_answer, correct_answer, is_correct,
+                  config['points'],
                   saw_solution)
 
     if is_correct or request.args.get('show_solution') == 'true':

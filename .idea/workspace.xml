@@ -4,14 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="optimization">
+    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="all working module equations">
+      <change afterPath="$PROJECT_DIR$/data/solutions.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/group_solutions.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/configs.py" beforeDir="false" afterPath="$PROJECT_DIR$/configs.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/__all_models.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/__all_models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db/web.db" beforeDir="false" afterPath="$PROJECT_DIR$/db/web.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/maths.py" beforeDir="false" afterPath="$PROJECT_DIR$/maths.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/task_opened.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/task_opened.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/task_window.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/task_window.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/group_details.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/group_details.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -204,14 +205,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1762618722997</updated>
-    </task>
-    <task id="LOCAL-00001" summary="more optimization">
-      <option name="closed" value="true" />
-      <created>1762625106209</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1762625106209</updated>
     </task>
     <task id="LOCAL-00002" summary="more optimization">
       <option name="closed" value="true" />
@@ -597,7 +590,15 @@
       <option name="project" value="LOCAL" />
       <updated>1767952775932</updated>
     </task>
-    <option name="localTasksCounter" value="50" />
+    <task id="LOCAL-00050" summary="all working module equations">
+      <option name="closed" value="true" />
+      <created>1768035157835</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1768035157835</updated>
+    </task>
+    <option name="localTasksCounter" value="51" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -612,7 +613,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="table design" />
     <MESSAGE value="readme" />
     <MESSAGE value="add generate and find coofs iirational equation" />
     <MESSAGE value="add answer and check_asnwer funcs for irrational equations" />
@@ -637,6 +637,7 @@
     <MESSAGE value="fix" />
     <MESSAGE value="add module equations" />
     <MESSAGE value="optimization" />
-    <option name="LAST_COMMIT_MESSAGE" value="optimization" />
+    <MESSAGE value="all working module equations" />
+    <option name="LAST_COMMIT_MESSAGE" value="all working module equations" />
   </component>
 </project>

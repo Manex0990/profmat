@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, flash, request, make_response
 from data import db_session
+from data.solutions import Solution
 from data.users import User
 from data.groups import Group
 from data.group_members import GroupMember
@@ -33,6 +34,35 @@ for operation, config in OPERATIONS_CONFIG.items():
             'get_solution': lambda task, op=operation:
             [f'Просто {["сложим", "вычтем", "перемножим", "разделим"][["sum", "min", "mul", "crop"].index(op)]} все коэффициенты',
              f'Ответ: {ex.answer_for_all_stages(task)}']}
+
+
+def save_solution(group_id, user_id, task_type, task_content, user_answer, correct_answer, is_correct, points,
+                  saw_solution):
+    db_sess = db_session.create_session()
+    try:
+        solution = Solution(
+            task_type=task_type,
+            task_content=task_content,
+            user_answer=user_answer,
+            correct_answer=correct_answer,
+            is_correct=is_correct,
+            points_awarded=points if is_correct and not saw_solution else 0,
+            user_id=user_id,
+            group_id=group_id
+        )
+        db_sess.add(solution)
+
+        if is_correct and not saw_solution:
+            member = db_sess.query(GroupMember).filter_by(group_id=group_id, user_id=user_id).first()
+            if member:
+                member.points += points
+
+        db_sess.commit()
+    except Exception as e:
+        print(f"Error saving solution: {e}")
+        db_sess.rollback()
+    finally:
+        db_sess.close()
 
 
 def update_points(group_id, user_id, points):
@@ -98,10 +128,12 @@ def handle_task_request(group_id, task_key, cookie_name, show_solution=False, te
     # POST запрос
     user_answer = form.answer.data
     verdict = config['check_func'](task, user_answer)
+    message, is_correct, eq_type, correct_answer = verdict
+    saw_solution = request.cookies.get('solution') == '1'
+    save_solution(group_id, current_user.id, task_key, task, user_answer, correct_answer, is_correct, config['points'],
+                  saw_solution)
 
-    if verdict[1]:
-        if request.cookies.get('solution') == '0':  # начисляем баллы, только если пользователь не видел решения задания
-            update_points(group_id, current_user.id, config['points'])
+    if is_correct or request.args.get('show_solution') == 'true':
         solution_log = config['get_solution'](task)
         show_solution_param = True  # Показываем решение после правильного ответа
     else:
@@ -201,6 +233,27 @@ def show_solution(group_id, task_type):
     response = redirect(url_for(route_mapping[task_type], group_id=group_id, show_solution='true'))
     response.set_cookie('solution', '1', max_age=60 * 60 * 24 * 365 * 2)
     return response
+
+
+@app.route('/group/<int:group_id>/solutions')
+@login_required
+def group_solutions(group_id):
+    db_sess = db_session.create_session()
+    group = db_sess.query(Group).get(group_id)
+    if not group:
+        flash("Группа не найдена")
+        return redirect(url_for('view_groups'))
+
+    # Проверяем, что текущий пользователь - учитель этой группы
+    teacher = db_sess.query(GroupMember).filter_by(group_id=group_id, user_id=current_user.id, is_teacher=True).first()
+    if not teacher:
+        flash("Нет доступа")
+        return redirect(url_for('view_groups'))
+
+    # Получаем все решения для этой группы, отсортированные по дате
+    solutions = db_sess.query(Solution).filter_by(group_id=group_id).order_by(Solution.submitted_at.desc()).all()
+
+    return render_template('group_solutions.html', group=group, solutions=solutions)
 
 
 @app.route('/student_groups/<int:group_id>/task/<name>', methods=['GET', 'POST'])

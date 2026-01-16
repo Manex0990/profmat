@@ -13,6 +13,12 @@
     <button type="btn-submit" class="btn btn-primary">Сгенерировать новую ссылку</button>
 </form>
 
+<nav>
+    <ul>
+        <a href="{{ url_for('group_solutions', group_id=group.id) }}">История решений</a>
+    </ul>
+</nav>
+
 <h2>Участники</h2>
 <table class="table">
     <thead>

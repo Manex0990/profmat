@@ -465,7 +465,7 @@ class MyMath:
         is_correct = str(user_ans) == correct_answer
         message = ("Верно. Продолжайте в том же духе." if is_correct
                    else "Неверно. Проверьте расчёты и попробуйте еще раз.")
-        return [message, is_correct, eq_type]
+        return [message, is_correct, eq_type, correct_answer]
 
     def check_answer_linear_equation(self, task: str, user_answer: str) -> List:
         return self.check_answer(task, user_answer, 'linear')
@@ -548,7 +548,7 @@ class MyMath:
         task_type, stage = self.identify_task_type(task)
 
         message = "Верно. Продолжайте в том же духе." if is_correct else "Неверно. Проверьте расчеты и попробуйте позже."
-        return [message, is_correct, f"{task_type}_{stage}"]
+        return [message, is_correct, f"{task_type}_{stage}", correct_ans]
 
     # Генераторы примеров
     def generate_simple_operation(self, op: str, range1: Tuple, range2: Tuple, integers: bool = True) -> str:
@@ -613,11 +613,3 @@ class MyMath:
 
     def generate_crop_stage_3(self) -> str:
         return self.generate_complex_operation(':', [(10, 40), (1, 8), (1, 6), (1, 4)], [True, False, False, True])
-
-
-ex = MyMath()
-task = '|-3x - 1| = 3x - 1'
-print(task)
-print(ex.find_coofs_module_equation(task))
-print(ex.answer_module_equation(task))
-print(ex.check_answer_module_equation(task, ex.answer_module_equation(task)))

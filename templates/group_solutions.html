@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>История решений группы {{ group.name }}</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Дата</th>
+            <th>Ученик</th>
+            <th>Тип задачи</th>
+            <th>Задача</th>
+            <th>Ответ ученика</th>
+            <th>Правильный ответ</th>
+            <th>Баллы</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for solution in solutions %}
+        <tr>
+            <td>{{ solution.submitted_at.strftime('%d.%m.%Y %H:%M') }}</td>
+            <td>{{ solution.user.surname }} {{ solution.user.name }}</td>
+            <td>{{ solution.task_type }}</td>
+            <td>{{ solution.task_content }}</td>
+            <td>{{ solution.user_answer }}</td>
+            <td>{{ solution.correct_answer }}</td>
+            <td>{{ solution.points_awarded }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

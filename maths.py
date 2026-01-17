@@ -548,7 +548,7 @@ class MyMath:
         task_type, stage = self.identify_task_type(task)
 
         message = "Верно. Продолжайте в том же духе." if is_correct else "Неверно. Проверьте расчеты и попробуйте позже."
-        return [message, is_correct, f"{task_type}_{stage}", correct_ans]
+        return [message, is_correct, f"{task_type}_{stage}", correct_answer]
 
     # Генераторы примеров
     def generate_simple_operation(self, op: str, range1: Tuple, range2: Tuple, integers: bool = True) -> str:

@@ -3,6 +3,54 @@
 {% block content %}
 <h2>История решений группы {{ group.name }}</h2>
 
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+
+    {{ form.surname.label }}<br>
+    {{ form.surname(class="form-control") }}<br>
+    {% for error in form.surname.errors %}
+    <p class="alert alert-danger" role="alert">
+        {{ error }}
+    </p>
+    {% endfor %}
+
+    {{ form.name.label }}<br>
+    {{ form.name(class="form-control") }}<br>
+    {% for error in form.name.errors %}
+    <p class="alert alert-danger" role="alert">
+        {{ error }}
+    </p>
+    {% endfor %}
+
+    {{ form.patronymic.label }}<br>
+    {{ form.patronymic(class="form-control") }}<br>
+    {% for error in form.patronymic.errors %}
+    <p class="alert alert-danger" role="alert">
+        {{ error }}
+    </p>
+    {% endfor %}
+
+    {{ form.date.label }}<br>
+    {{ form.date(class="form-control") }}<br>
+    {% for error in form.date.errors %}
+    <p class="alert alert-danger" role="alert">
+        {{ error }}
+    </p>
+    {% endfor %}
+
+    <center>
+        <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+        <br/>
+        <br/>
+        <p>{{ form.show_all(type="submit", class="btn btn-secondary") }}</p>
+    </center>
+    <br/>
+    <br/>
+    <p>{{ form.clean(type="submit", class="btn btn-danger", onclick="return confirm('Вы уверены, что хотите очистить всю историю решений?')") }}</p>
+</form>
+
+<br/>
+
 <table class="table">
     <thead>
         <tr>
@@ -19,14 +67,19 @@
         {% for solution in solutions %}
         <tr>
             <td>{{ solution.submitted_at.strftime('%d.%m.%Y %H:%M') }}</td>
-            <td>{{ solution.user.surname }} {{ solution.user.name }}</td>
+            <td>{{ solution.user.surname }} {{ solution.user.name }} {{ solution.user.patronymic }}</td>
             <td>{{ solution.task_type }}</td>
             <td>{{ solution.task_content }}</td>
             <td>{{ solution.user_answer }}</td>
             <td>{{ solution.correct_answer }}</td>
             <td>{{ solution.points_awarded }}</td>
         </tr>
+        {% else %}
+        <tr>
+            <td colspan="7" class="text-center">Нет решений для отображения</td>
+        </tr>
         {% endfor %}
     </tbody>
 </table>
+
 {% endblock %}

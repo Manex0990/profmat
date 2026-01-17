@@ -1,9 +1,12 @@
+from datetime import datetime
+
 from flask import Flask, render_template, redirect, url_for, flash, request, make_response
 from data import db_session
 from data.solutions import Solution
 from data.users import User
 from data.groups import Group
 from data.group_members import GroupMember
+from form.group_solution import GroupSolutionsForm
 from form.user import RegisterForm, LoginForm, GroupForm
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required
 import uuid
@@ -236,25 +239,121 @@ def show_solution(group_id, task_type):
     return response
 
 
-@app.route('/group/<int:group_id>/solutions')
+@app.route('/group/<int:group_id>/solutions', methods=['GET', 'POST'])
 @login_required
 def group_solutions(group_id):
     db_sess = db_session.create_session()
-    group = db_sess.query(Group).get(group_id)
-    if not group:
-        flash("Группа не найдена")
-        return redirect(url_for('view_groups'))
+    try:
+        group = db_sess.query(Group).get(group_id)
+        if not group:
+            flash("Группа не найдена")
+            return redirect(url_for('view_groups'))
 
-    # Проверяем, что текущий пользователь - учитель этой группы
-    teacher = db_sess.query(GroupMember).filter_by(group_id=group_id, user_id=current_user.id, is_teacher=True).first()
-    if not teacher:
-        flash("Нет доступа")
-        return redirect(url_for('view_groups'))
+        # Проверяем, что текущий пользователь - учитель этой группы
+        teacher = db_sess.query(GroupMember).filter_by(
+            group_id=group_id,
+            user_id=current_user.id,
+            is_teacher=True
+        ).first()
+        if not teacher:
+            flash("Нет доступа")
+            return redirect(url_for('view_groups'))
 
-    # Получаем все решения для этой группы, отсортированные по дате
-    solutions = db_sess.query(Solution).filter_by(group_id=group_id).order_by(Solution.submitted_at.desc()).all()
+        form = GroupSolutionsForm()
 
-    return render_template('group_solutions.html', group=group, solutions=solutions)
+        # Если это GET-запрос, показываем все решения
+        if request.method == 'GET':
+            solutions = db_sess.query(Solution).filter_by(group_id=group_id).order_by(
+                Solution.submitted_at.desc()).all()
+            return render_template('group_solutions.html', group=group, solutions=solutions, form=form)
+
+        # Если это POST-запрос (отправлена форма)
+        if form.validate_on_submit():
+            # Проверяем, какая кнопка была нажата
+            if form.clean.data:  # Кнопка "Очистить историю"
+                # Удаляем все решения для этой группы
+                db_sess.query(Solution).filter_by(group_id=group_id).delete()
+                db_sess.commit()
+                flash("История решений очищена", "success")
+                return redirect(url_for('group_solutions', group_id=group_id))
+
+            elif form.submit.data or form.show_all.data:  # Кнопки "Найти" или "Показать все"
+                # Получаем данные из формы
+                searching_surname = form.surname.data.strip() if form.surname.data else None
+                searching_name = form.name.data.strip() if form.name.data else None
+                searching_patronymic = form.patronymic.data.strip() if form.patronymic.data else None
+                searching_date = form.date.data
+
+                # Начинаем с базового запроса
+                solutions_query = db_sess.query(Solution).filter_by(group_id=group_id)
+
+                # Если нажата "Показать все" или все поля пустые - показываем все
+                if form.show_all.data or not any(
+                        [searching_surname, searching_name, searching_patronymic, searching_date]):
+                    solutions = solutions_query.order_by(Solution.submitted_at.desc()).all()
+                    return render_template('group_solutions.html', group=group, solutions=solutions, form=form)
+
+                # Применяем фильтры
+                # Фильтр по дате
+                if searching_date:
+                    start_date = datetime.combine(searching_date, datetime.min.time())
+                    end_date = datetime.combine(searching_date, datetime.max.time())
+                    solutions_query = solutions_query.filter(
+                        Solution.submitted_at >= start_date,
+                        Solution.submitted_at <= end_date
+                    )
+
+                # Фильтр по ФИО
+                filtered_user_ids = []
+                if searching_surname or searching_name or searching_patronymic:
+                    # Находим всех учеников группы
+                    group_students = db_sess.query(User).join(GroupMember).filter(
+                        GroupMember.group_id == group_id,
+                        GroupMember.is_teacher == False
+                    ).all()
+
+                    # Фильтруем учеников по заданным критериям
+                    for student in group_students:
+                        match = True
+
+                        if searching_surname:
+                            if not student.surname or searching_surname.lower() != student.surname.lower():
+                                match = False
+
+                        if searching_name:
+                            if not student.name or searching_name.lower() != student.name.lower():
+                                match = False
+
+                        if searching_patronymic:
+                            if not student.patronymic or searching_patronymic.lower() != student.patronymic.lower():
+                                match = False
+
+                        if match:
+                            filtered_user_ids.append(student.id)
+
+                # Если есть фильтры по ФИО, применяем их
+                if filtered_user_ids:
+                    solutions_query = solutions_query.filter(Solution.user_id.in_(filtered_user_ids))
+                elif searching_surname or searching_name or searching_patronymic:
+                    # Если указаны критерии ФИО, но никто не найден - возвращаем пустой список
+                    solutions = []
+                    return render_template('group_solutions.html', group=group, solutions=solutions, form=form)
+
+                # Получаем результаты
+                solutions = solutions_query.order_by(Solution.submitted_at.desc()).all()
+
+                return render_template('group_solutions.html', group=group, solutions=solutions, form=form)
+
+        # Если форма не прошла валидацию
+        solutions = db_sess.query(Solution).filter_by(group_id=group_id).order_by(Solution.submitted_at.desc()).all()
+        return render_template('group_solutions.html', group=group, solutions=solutions, form=form)
+
+    except Exception as e:
+        print(f"Ошибка в group_solutions: {e}")
+        flash(f"Произошла ошибка: {e}", "error")
+        return redirect(url_for('view_group', group_id=group_id))
+    finally:
+        db_sess.close()
 
 
 @app.route('/student_groups/<int:group_id>/task/<name>', methods=['GET', 'POST'])

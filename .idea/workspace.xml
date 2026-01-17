@@ -4,13 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="russian name in solutions history">
-      <change afterPath="$PROJECT_DIR$/form/group_solution.py" afterDir="false" />
+    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="cosmetic change">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db/web.db" beforeDir="false" afterPath="$PROJECT_DIR$/db/web.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maths.py" beforeDir="false" afterPath="$PROJECT_DIR$/maths.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/group_solutions.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/group_solutions.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/css/css_file.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/css_file.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -203,22 +200,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1762618722997</updated>
-    </task>
-    <task id="LOCAL-00004" summary="small fixes">
-      <option name="closed" value="true" />
-      <created>1762633699086</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1762633699086</updated>
-    </task>
-    <task id="LOCAL-00005" summary="rename variable">
-      <option name="closed" value="true" />
-      <created>1762793395705</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1762793395705</updated>
     </task>
     <task id="LOCAL-00006" summary="upgrade requirements.txt">
       <option name="closed" value="true" />
@@ -596,7 +577,23 @@
       <option name="project" value="LOCAL" />
       <updated>1768582461033</updated>
     </task>
-    <option name="localTasksCounter" value="53" />
+    <task id="LOCAL-00053" summary="add searching system in solutions history">
+      <option name="closed" value="true" />
+      <created>1768663083591</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1768663083591</updated>
+    </task>
+    <task id="LOCAL-00054" summary="cosmetic change">
+      <option name="closed" value="true" />
+      <created>1768663458977</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1768663458977</updated>
+    </task>
+    <option name="localTasksCounter" value="55" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -611,8 +608,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="add answer and check_asnwer funcs for irrational equations" />
-    <MESSAGE value="little change ranges in random generate" />
     <MESSAGE value="много исправлений: теперь если дробь конечная то до сотых округлять не надо, баг с проверкой иррационального уравнения. все задания работают корректно. добавлено подробное решение иррационального уравнения" />
     <MESSAGE value="all working irrational equations" />
     <MESSAGE value="now u can open solution" />
@@ -636,6 +631,8 @@
     <MESSAGE value="all working module equations" />
     <MESSAGE value="add solutions history" />
     <MESSAGE value="russian name in solutions history" />
-    <option name="LAST_COMMIT_MESSAGE" value="russian name in solutions history" />
+    <MESSAGE value="add searching system in solutions history" />
+    <MESSAGE value="cosmetic change" />
+    <option name="LAST_COMMIT_MESSAGE" value="cosmetic change" />
   </component>
 </project>

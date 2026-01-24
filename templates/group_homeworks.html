@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Домашние задания группы "{{ group.name }}"</h2>
+
+    {% if is_teacher %}
+    <div class="mb-3">
+        <a href="{{ url_for('upload_homework', group_id=group.id) }}" class="btn btn-success mb-3">
+            <i class="fas fa-plus"></i> Добавить задание
+        </a>
+    </div>
+    {% endif %}
+
+    {% if homeworks %}
+    <div class="list-group">
+        {% for hw in homeworks %}
+        <div class="list-group-item">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center">
+                        {% if hw.filename.endswith('.pdf') %}
+                            <i class="fas fa-file-pdf text-danger fa-2x mr-3"></i>
+                        {% elif hw.filename.endswith(('.png', '.jpg', '.jpeg')) %}
+                            <i class="fas fa-file-image text-primary fa-2x mr-3"></i>
+                        {% elif hw.filename.endswith(('.doc', '.docx')) %}
+                            <i class="fas fa-file-word text-info fa-2x mr-3"></i>
+                        {% elif hw.filename.endswith('.txt') %}
+                            <i class="fas fa-file-alt text-secondary fa-2x mr-3"></i>
+                        {% elif hw.filename.endswith(('.zip', '.rar')) %}
+                            <i class="fas fa-file-archive text-warning fa-2x mr-3"></i>
+                        {% else %}
+                            <i class="fas fa-file fa-2x mr-3"></i>
+                        {% endif %}
+
+                        <div>
+                            <h5 class="mb-1">{{ hw.original_filename }}</h5>
+                            {% if hw.description %}
+                            <p class="mb-1 text-muted">{{ hw.description }}</p>
+                            {% endif %}
+                            <small class="text-muted">
+                                Добавлено: {{ hw.teacher.surname }} {{ hw.teacher.name }} |
+                                {{ hw.created_at.strftime('%d.%m.%Y %H:%M') }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="ml-3">
+                    <a href="{{ url_for('download_homework', homework_id=hw.id) }}"
+                       class="btn btn-sm btn-primary" title="Скачать">
+                        <i class="fas fa-download"></i>
+                    </a>
+
+                    {% if is_teacher and current_user.id == hw.user_id %}
+                    <form method="POST" action="{{ url_for('delete_homework', homework_id=hw.id) }}"
+                          style="display: inline;"
+                          onsubmit="return confirm('Удалить это задание?');">
+                        <button type="submit" class="btn btn-sm btn-danger" title="Удалить">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        Пока нет домашних заданий
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

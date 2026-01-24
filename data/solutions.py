@@ -21,3 +21,4 @@ class Solution(SqlAlchemyBase):
 
     user = orm.relationship('User')
     group = orm.relationship('Group')
+    files = orm.relationship("SolutionFile", back_populates="solution", cascade="all, delete-orphan")

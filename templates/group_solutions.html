@@ -60,6 +60,7 @@
             <th>Задача</th>
             <th>Ответ ученика</th>
             <th>Правильный ответ</th>
+            <th>Файлы</th>
             <th>Баллы</th>
         </tr>
     </thead>
@@ -72,11 +73,20 @@
             <td>{{ solution.task_content }}</td>
             <td>{{ solution.user_answer }}</td>
             <td>{{ solution.correct_answer }}</td>
+            <td>
+                {% for file in solution.files %}
+                    <a href="{{ url_for('download_solution_file', file_id=file.id) }}"
+                       class="btn btn-sm btn-outline-secondary mb-1"
+                       title="{{ file.original_filename }}">
+                        <i class="fas fa-file"></i> Файл {{ loop.index }}
+                    </a><br>
+                {% endfor %}
+            </td>
             <td>{{ solution.points_awarded }}</td>
         </tr>
         {% else %}
         <tr>
-            <td colspan="7" class="text-center">Нет решений для отображения</td>
+            <td colspan="8" class="text-center">Нет решений для отображения</td>
         </tr>
         {% endfor %}
     </tbody>

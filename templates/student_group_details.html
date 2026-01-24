@@ -1,11 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>{{ group.name }}</h1>
+
 <nav>
     <ul>
         <a href="/student_groups/{{ group.id }}/task">Решать задачи</a></li>
+        <a href="{{ url_for('group_homeworks', group_id=group.id) }}">Домашние задания</a>
     </ul>
 </nav>
+
 <h2>Участники группы:</h2>
 <table class="table">
     <thead>

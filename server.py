@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from flask import Flask, render_template, redirect, url_for, flash, request, make_response
 from data import db_session
 from data.solutions import Solution
@@ -13,8 +12,13 @@ import uuid
 from form.task import TaskForm
 from sqlalchemy.orm import joinedload
 from werkzeug.utils import secure_filename
-import os
 from configs import TASK_CONFIG, OPERATIONS_CONFIG, route_mapping, ex, secret_key, task_type_names
+import os
+from werkzeug.utils import secure_filename
+from flask import send_from_directory, abort
+from data.homeworks import Homework
+from data.solution_files import SolutionFile
+from form.homework import HomeworkForm
 
 app = Flask(__name__, static_folder='static')
 app.config['SECRET_KEY'] = secret_key
@@ -24,6 +28,25 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 db_session.global_init("db/web.db")
+
+# Конфигурация загрузки файлов
+UPLOAD_FOLDER = 'static/uploads'
+HOMEWORK_FOLDER = os.path.join(UPLOAD_FOLDER, 'homeworks')
+SOLUTION_FOLDER = os.path.join(UPLOAD_FOLDER, 'solutions')
+ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'doc', 'docx', 'txt', 'zip', 'rar'}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 32 * 1024 * 1024  # 32 MB
+
+# Создаем папки, если их нет
+os.makedirs(HOMEWORK_FOLDER, exist_ok=True)
+os.makedirs(SOLUTION_FOLDER, exist_ok=True)
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 # Генерация функций для примеров
 for operation, config in OPERATIONS_CONFIG.items():
@@ -40,7 +63,7 @@ for operation, config in OPERATIONS_CONFIG.items():
 
 
 def save_solution(group_id, user_id, task_type, task_content, user_answer, correct_answer, is_correct, points,
-                  saw_solution):
+                  saw_solution, file=None):
     db_sess = db_session.create_session()
     try:
         solution = Solution(
@@ -54,6 +77,22 @@ def save_solution(group_id, user_id, task_type, task_content, user_answer, corre
             group_id=group_id
         )
         db_sess.add(solution)
+        db_sess.flush()  # Получаем ID решения
+
+        # Сохраняем файл, если он был загружен
+        if file and file.filename:
+            filename = secure_filename(file.filename)
+            unique_filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{user_id}_{filename}"
+            filepath = os.path.join(SOLUTION_FOLDER, unique_filename)
+            file.save(filepath)
+
+            solution_file = SolutionFile(
+                solution_id=solution.id,
+                filename=unique_filename,
+                original_filename=filename,
+                filepath=filepath
+            )
+            db_sess.add(solution_file)
 
         if is_correct and not saw_solution:
             member = db_sess.query(GroupMember).filter_by(group_id=group_id, user_id=user_id).first()
@@ -61,9 +100,11 @@ def save_solution(group_id, user_id, task_type, task_content, user_answer, corre
                 member.points += points
 
         db_sess.commit()
+        return solution.id
     except Exception as e:
         print(f"Error saving solution: {e}")
         db_sess.rollback()
+        return None
     finally:
         db_sess.close()
 
@@ -133,16 +174,18 @@ def handle_task_request(group_id, task_key, cookie_name, show_solution=False, te
     verdict = config['check_func'](task, user_answer)
     message, is_correct, eq_type, correct_answer = verdict
     saw_solution = request.cookies.get('solution') == '1'
-    save_solution(group_id, current_user.id, task_type_names[task_key], task, user_answer, correct_answer, is_correct,
-                  config['points'],
-                  saw_solution)
+
+    # Получаем файл из формы
+    file = form.file.data if form.file.data and form.file.data.filename else None
+
+    save_solution(group_id, current_user.id, task_type_names[task_key], task, user_answer,
+                  correct_answer, is_correct, config['points'], saw_solution, file)
 
     if is_correct or request.args.get('show_solution') == 'true':
         solution_log = config['get_solution'](task)
-        show_solution_param = True  # Показываем решение после правильного ответа
+        show_solution_param = True
     else:
         solution_log = None
-        # Даже при неправильном ответе можем показать решение, если был запрос
         if request.args.get('show_solution') == 'true':
             solution_log = config['get_solution'](task)
             show_solution_param = True
@@ -352,6 +395,205 @@ def group_solutions(group_id):
         print(f"Ошибка в group_solutions: {e}")
         flash(f"Произошла ошибка: {e}", "error")
         return redirect(url_for('view_group', group_id=group_id))
+    finally:
+        db_sess.close()
+
+
+# Маршруты для домашних заданий
+@app.route('/group/<int:group_id>/homeworks')
+@login_required
+def group_homeworks(group_id):
+    """Просмотр домашних заданий группы"""
+    db_sess = db_session.create_session()
+    try:
+        group = db_sess.query(Group).get(group_id)
+
+        if not group:
+            abort(404)
+
+        # Проверка доступа
+        teacher = db_sess.query(GroupMember).filter_by(
+            group_id=group_id,
+            user_id=current_user.id,
+            is_teacher=True
+        ).first()
+
+        # Проверяем, является ли пользователь участником группы или учителем
+        if not any([current_user.id == member.user_id for member in group.members]) \
+                and not teacher:
+            abort(403)
+
+        homeworks = db_sess.query(Homework).filter_by(group_id=group_id).order_by(Homework.created_at.desc()).all()
+
+        return render_template('group_homeworks.html',
+                               group=group,
+                               homeworks=homeworks,
+                               is_teacher=bool(teacher))
+    finally:
+        db_sess.close()
+
+
+@app.route('/group/<int:group_id>/upload_homework', methods=['GET', 'POST'])
+@login_required
+def upload_homework(group_id):
+    """Загрузка домашнего задания (только для учителей)"""
+    db_sess = db_session.create_session()
+    try:
+        # Проверяем, является ли пользователь учителем в этой группе
+        teacher = db_sess.query(GroupMember).filter_by(
+            group_id=group_id,
+            user_id=current_user.id,
+            is_teacher=True
+        ).first()
+
+        if not teacher:
+            abort(403)
+
+        group = db_sess.query(Group).get(group_id)
+
+        if not group:
+            abort(404)
+
+        form = HomeworkForm()
+
+        if form.validate_on_submit():
+            file = form.file.data
+
+            if file and allowed_file(file.filename):
+                # Генерируем уникальное имя файла
+                filename = secure_filename(file.filename)
+                unique_filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{current_user.id}_{filename}"
+                filepath = os.path.join(HOMEWORK_FOLDER, unique_filename)
+
+                # Сохраняем файл
+                file.save(filepath)
+
+                # Сохраняем информацию в БД
+                homework = Homework(
+                    group_id=group_id,
+                    user_id=current_user.id,
+                    filename=unique_filename,
+                    original_filename=filename,
+                    filepath=filepath,
+                    description=form.description.data
+                )
+
+                db_sess.add(homework)
+                db_sess.commit()
+
+                flash('Задание успешно добавлено!', 'success')
+                return redirect(url_for('group_homeworks', group_id=group_id))
+            else:
+                flash('Недопустимый формат файла', 'danger')
+
+        return render_template('upload_homework.html', form=form, group=group)
+    finally:
+        db_sess.close()
+
+
+@app.route('/homework/<int:homework_id>/download')
+@login_required
+def download_homework(homework_id):
+    """Скачивание домашнего задания"""
+    db_sess = db_session.create_session()
+    try:
+        homework = db_sess.query(Homework).get(homework_id)
+
+        if not homework:
+            abort(404)
+
+        # Проверка доступа
+        group = homework.group
+        if not any([current_user.id == member.user_id for member in group.members]) \
+                and not db_sess.query(GroupMember).filter_by(
+            group_id=group.id,
+            user_id=current_user.id,
+            is_teacher=True
+        ).first():
+            abort(403)
+
+        # Отправляем файл
+        try:
+            return send_from_directory(
+                HOMEWORK_FOLDER,
+                homework.filename,
+                as_attachment=True,
+                download_name=homework.original_filename
+            )
+        except FileNotFoundError:
+            flash('Файл не найден', 'danger')
+            return redirect(url_for('group_homeworks', group_id=homework.group_id))
+    finally:
+        db_sess.close()
+
+
+@app.route('/homework/<int:homework_id>/delete', methods=['POST'])
+@login_required
+def delete_homework(homework_id):
+    """Удаление домашнего задания (только учитель, который добавил)"""
+    db_sess = db_session.create_session()
+    try:
+        homework = db_sess.query(Homework).get(homework_id)
+
+        if not homework:
+            abort(404)
+
+        # Проверяем, является ли пользователь учителем, который добавил задание
+        if current_user.id != homework.user_id:
+            abort(403)
+
+        # Удаляем файл
+        try:
+            os.remove(homework.filepath)
+        except:
+            pass
+
+        # Удаляем запись из БД
+        group_id = homework.group_id
+        db_sess.delete(homework)
+        db_sess.commit()
+
+        flash('Задание удалено', 'success')
+        return redirect(url_for('group_homeworks', group_id=group_id))
+    finally:
+        db_sess.close()
+
+
+@app.route('/solution_file/<int:file_id>/download')
+@login_required
+def download_solution_file(file_id):
+    """Скачивание файла решения"""
+    db_sess = db_session.create_session()
+    try:
+        solution_file = db_sess.query(SolutionFile).get(file_id)
+
+        if not solution_file:
+            abort(404)
+
+        solution = solution_file.solution
+
+        # Проверка доступа
+        # Учитель группы или сам ученик
+        teacher = db_sess.query(GroupMember).filter_by(
+            group_id=solution.group_id,
+            user_id=current_user.id,
+            is_teacher=True
+        ).first()
+
+        if not teacher and current_user.id != solution.user_id:
+            abort(403)
+
+        # Отправляем файл
+        try:
+            return send_from_directory(
+                SOLUTION_FOLDER,
+                solution_file.filename,
+                as_attachment=True,
+                download_name=solution_file.original_filename
+            )
+        except FileNotFoundError:
+            flash('Файл не найден', 'danger')
+            return redirect(url_for('group_solutions', group_id=solution.group_id))
     finally:
         db_sess.close()
 

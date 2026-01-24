@@ -51,6 +51,8 @@
 
         <h2>Если получается бесконечная дробь округлите до сотых (если есть незначащие нули в конце, уберите их).
             Разделитель для дробных чисел - точка.</h2>
+
+        <h2>Вы также можете прикрепить файл с решением (необязательно).</h2>
     {% endif %}
 
     <nav>
@@ -64,7 +66,7 @@
         </ul>
     </nav>
 
-    <form action="" method="post">
+    <form action="" method="post" enctype="multipart/form-data">
         {% if not show_solution %}
             {{ form.answer.label }}<br>
             {{ form.answer(class="form-control") }}<br>
@@ -74,8 +76,24 @@
             </p>
             {% endfor %}
 
+            <!-- Поле для прикрепления файла -->
+            <div class="form-group mt-3">
+                {{ form.file.label }}<br>
+                {{ form.file(class="form-control-file") }}
+                {% if form.file.errors %}
+                    {% for error in form.file.errors %}
+                        <p class="alert alert-danger" role="alert">
+                            {{ error }}
+                        </p>
+                    {% endfor %}
+                {% endif %}
+                <small class="form-text text-muted">
+                    Можно прикрепить файл с решением (PDF, PNG, JPG, DOC, TXT, ZIP, RAR). Максимальный размер: 16MB.
+                </small>
+            </div>
+
             <center>
-                <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+                <p>{{ form.submit(type="submit", class="btn btn-primary mt-3") }}</p>
             </center>
         {% endif %}
 
@@ -95,6 +113,6 @@
 
     <br/>
     <br/>
-    <a class="btn btn-primary " href="/student_groups/{{ group.id }}/task">Назад</a>
+    <a class="btn btn-primary" href="/student_groups/{{ group.id }}/task">Назад</a>
 </body>
 {% endblock %}

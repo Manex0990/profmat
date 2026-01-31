@@ -11,7 +11,6 @@ from flask_login import LoginManager, login_user, logout_user, current_user, log
 import uuid
 from form.task import TaskForm
 from sqlalchemy.orm import joinedload
-from werkzeug.utils import secure_filename
 from configs import TASK_CONFIG, OPERATIONS_CONFIG, route_mapping, ex, secret_key, task_type_names
 import os
 from werkzeug.utils import secure_filename
@@ -624,9 +623,10 @@ def load_user(user_id):
 
 
 @app.route('/')
-@login_required
 def index():
-    return render_template('base.html')
+    if current_user.is_authenticated:
+        return redirect(url_for('profile'))
+    return render_template('landing.html')  # Показываем лендинг неавторизованным
 
 
 @app.route('/register', methods=['GET', 'POST'])

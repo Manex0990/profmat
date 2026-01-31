@@ -418,3 +418,51 @@ h3 {
 .table tr:hover {
     background: rgba(102, 126, 234, 0.05);
 }
+
+.nav-tabs .nav-link {
+    font-size: 1.1rem;
+    padding: 12px 24px;
+    margin: 0 5px;
+    border-radius: 8px 8px 0 0;
+    color: #495057;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.nav-tabs .nav-link:hover {
+    background-color: #f8f9fa;
+    border-color: #dee2e6 #dee2e6 #fff;
+}
+
+.nav-tabs .nav-link.active {
+    color: #0d6efd;
+    background-color: #fff;
+    border-color: #dee2e6 #dee2e6 #fff;
+    border-bottom: 3px solid #0d6efd;
+    font-weight: 600;
+}
+
+.feature-item {
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #f8f9fa;
+    height: 100%;
+    transition: transform 0.3s;
+}
+
+.feature-item:hover {
+    transform: translateY(-5px);
+    background-color: #e9ecef;
+}
+
+.feature-title {
+    color: #0d6efd;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.feature-text {
+    color: #6c757d;
+    margin-bottom: 20px;
+    min-height: 60px;
+}

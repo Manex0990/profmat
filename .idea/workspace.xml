@@ -4,23 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="add gitignore file">
-      <change afterPath="$PROJECT_DIR$/data/homeworks.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/solution_files.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/form/homework.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/group_homeworks.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/upload_homework.html" afterDir="false" />
+    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="add homeworks and files with solution">
+      <change afterPath="$PROJECT_DIR$/static/demo/homeworks_list_demo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/demo/solutions_history_demo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/demo/student_group_demo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/demo/task_list_demo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/demo/task_solution_demo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/demo/teacher_group_demo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/demo/upload_homeworks_demo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/landing.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/__all_models.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/__all_models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/solutions.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/solutions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/configs.py" beforeDir="false" afterPath="$PROJECT_DIR$/configs.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db/web.db" beforeDir="false" afterPath="$PROJECT_DIR$/db/web.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/form/task.py" beforeDir="false" afterPath="$PROJECT_DIR$/form/task.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/group_details.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/group_details.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/group_solutions.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/group_solutions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/student_group_details.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/student_group_details.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/task_opened.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/task_opened.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,6 +76,12 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.IDE.editor.colors.General&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\arsen\PycharmProjects\profmat\static\demo" />
+      <recent name="C:\Users\arsen\PycharmProjects\profmat\static" />
+    </key>
+  </component>
   <component name="RunManager" selected="Python.server">
     <configuration name="30" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="profmat" />
@@ -214,14 +216,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1762618722997</updated>
-    </task>
-    <task id="LOCAL-00009" summary="delete not used import">
-      <option name="closed" value="true" />
-      <created>1762800573980</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1762800573980</updated>
     </task>
     <task id="LOCAL-00010" summary="small fixes">
       <option name="closed" value="true" />
@@ -607,7 +601,15 @@
       <option name="project" value="LOCAL" />
       <updated>1768664777450</updated>
     </task>
-    <option name="localTasksCounter" value="58" />
+    <task id="LOCAL-00058" summary="add homeworks and files with solution">
+      <option name="closed" value="true" />
+      <created>1769258136606</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1769258136606</updated>
+    </task>
+    <option name="localTasksCounter" value="59" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -622,7 +624,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="little fix" />
     <MESSAGE value="fix bug with browser back button" />
     <MESSAGE value="add generation linear inequation" />
     <MESSAGE value="more optimization and work on linear inequation" />
@@ -647,6 +648,7 @@
     <MESSAGE value="rotate css in the special file" />
     <MESSAGE value="delete old files" />
     <MESSAGE value="add gitignore file" />
-    <option name="LAST_COMMIT_MESSAGE" value="add gitignore file" />
+    <MESSAGE value="add homeworks and files with solution" />
+    <option name="LAST_COMMIT_MESSAGE" value="add homeworks and files with solution" />
   </component>
 </project>

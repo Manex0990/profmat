@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 text-center">
+            <h1 class="display-4 mb-4">Образовательная платформа</h1>
+            <h2 class="lead mb-4">Система для обучения математике с автоматической проверкой заданий</h2>
+
+            <!-- Содержимое вкладок -->
+            <div class="tab-content" id="userTypeTabContent">
+
+                <!-- Вкладка для учителей -->
+                <div class="tab-pane fade show active" id="teachers" role="tabpanel"
+                     aria-labelledby="teachers-tab" tabindex="0">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title mb-4">Возможности для учителей</h2>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <div class="feature-item text-center">
+                                        <h4 class="feature-title">Создание групп</h4>
+                                        <p class="feature-text">Создавайте группы и приглашайте туда своих учеников, отслеживайте их прогресс</p>
+                                        <img src="{{ url_for('static', filename='demo/teacher_group_demo.png') }}"
+                                             alt="Создание групп"
+                                             class="img-fluid rounded shadow-sm"
+                                             style="max-width: 100%; height: auto; max-height: 250px;">
+                                    </div>
+                                </div>
+
+                                </br>
+                                </br>
+
+                                <div class="col-md-6 mb-4">
+                                    <div class="feature-item text-center">
+                                        <h4 class="feature-title">Загрузка заданий</h4>
+                                        <p class="feature-text">Загружайте файлы с домашними заданиями для ваших учеников</p>
+                                        <img src="{{ url_for('static', filename='demo/upload_homeworks_demo.png') }}"
+                                             alt="Загрузка заданий"
+                                             class="img-fluid rounded shadow-sm"
+                                             style="max-width: 100%; height: auto; max-height: 250px;">
+                                    </div>
+                                </div>
+
+                                </br>
+                                </br>
+
+                                <div class="col-md-6 mb-4">
+                                    <div class="feature-item text-center">
+                                        <h4 class="feature-title">История решений</h4>
+                                        <p class="feature-text">Изучайте историю решений, отслеживайте активность учеников</p>
+                                        <img src="{{ url_for('static', filename='demo/solutions_history_demo.png') }}"
+                                             alt="История решений"
+                                             class="img-fluid rounded shadow-sm"
+                                             style="max-width: 100%; height: auto; max-height: 250px;">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-person-plus me-2"></i>Начать как учитель
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                </br>
+                </br>
+                </br>
+                </br>
+
+                <!-- Вкладка для учеников -->
+                <div class="tab-pane fade" id="students" role="tabpanel"
+                     aria-labelledby="students-tab" tabindex="0">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title mb-4">Возможности для учеников</h2>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <div class="feature-item text-center">
+                                        <h4 class="feature-title">Таблица успеваемости</h4>
+                                        <p class="feature-text">Просматривайте и анализируйте свои результаты в таблице успеваемости</p>
+                                        <img src="{{ url_for('static', filename='demo/student_group_demo.png') }}"
+                                             alt="Таблица успеваемости"
+                                             class="img-fluid rounded shadow-sm"
+                                             style="max-width: 100%; height: auto; max-height: 250px;">
+                                    </div>
+                                </div>
+
+                                </br>
+                                </br>
+
+                                <div class="col-md-6 mb-4">
+                                    <div class="feature-item text-center">
+                                        <h4 class="feature-title">Решение заданий</h4>
+                                        <p class="feature-text">Решайте задания и получайте баллы за правильные решения</p>
+                                        <img src="{{ url_for('static', filename='demo/task_list_demo.png') }}"
+                                             alt="Решение заданий"
+                                             class="img-fluid rounded shadow-sm"
+                                             style="max-width: 100%; height: auto; max-height: 250px;">
+                                    </div>
+                                </div>
+
+                                </br>
+                                </br>
+
+                                <div class="col-md-6 mb-4">
+                                    <div class="feature-item text-center">
+                                        <h4 class="feature-title">Разборы заданий</h4>
+                                        <p class="feature-text">Изучайте подробные разборы непонятных вам заданий</p>
+                                        <img src="{{ url_for('static', filename='demo/task_solution_demo.png') }}"
+                                             alt="Разборы заданий"
+                                             class="img-fluid rounded shadow-sm"
+                                             style="max-width: 100%; height: auto; max-height: 250px;">
+                                    </div>
+                                </div>
+
+                                </br>
+                                </br>
+
+                                <div class="col-md-6 mb-4">
+                                    <div class="feature-item text-center">
+                                        <h4 class="feature-title">Список заданий</h4>
+                                        <p class="feature-text">Просматривайте список домашних заданий от учителя</p>
+                                        <img src="{{ url_for('static', filename='demo/homeworks_list_demo.png') }}"
+                                             alt="Список заданий"
+                                             class="img-fluid rounded shadow-sm"
+                                             style="max-width: 100%; height: auto; max-height: 250px;">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <a href="{{ url_for('register') }}" class="btn btn-success btn-lg">
+                                    <i class="bi bi-person-check me-2"></i>Начать как ученик
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            </br>
+            </br>
+            </br>
+            </br>
+
+            <div class="mt-5 pt-4 border-top">
+                <h3>Связь с разработчиком: arsenijcugajnov@yandex.ru</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -18,3 +18,4 @@ class Homework(SqlAlchemyBase):
 
     group = relationship("Group")
     teacher = relationship("User")
+    solutions = relationship("HomeworkSolution", back_populates="homework", cascade="all, delete-orphan")

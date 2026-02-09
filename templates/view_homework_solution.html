@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Решение домашнего задания</h2>
+    
+    <div class="card">
+        <div class="card-header">
+            <strong>Задание:</strong> {{ solution.homework.original_filename }}
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Ученик:</strong> {{ solution.user.surname }} {{ solution.user.name }}</p>
+                    <p><strong>Отправлено:</strong> {{ solution.submitted_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                </div>
+                <div class="col-md-6">
+                    {% if solution.is_graded %}
+                    <div class="alert alert-success">
+                        <h5><i class="fas fa-star"></i> Оценка: {{ solution.points_awarded }} баллов</h5>
+                        {% if solution.teacher_comment %}
+                        <p><strong>Комментарий учителя:</strong> {{ solution.teacher_comment }}</p>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <h5><i class="fas fa-clock"></i> Ожидает проверки</h5>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if solution.description %}
+            <div class="mb-3">
+                <h5>Комментарий ученика:</h5>
+                <p>{{ solution.description }}</p>
+            </div>
+            {% endif %}
+            
+            <div class="mb-3">
+                <h5>Прикрепленные файлы:</h5>
+                <div class="list-group">
+                    {% for file in solution.files %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-file me-2"></i>
+                                {{ file.original_filename }}
+                            </div>
+                            <div>
+                                <a href="{{ url_for('download_homework_solution_file', file_id=file.id) }}"
+                                   class="btn btn-sm btn-primary">
+                                    <i class="fas fa-download"></i> Скачать
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            {% if current_user.teacher %}
+            <div class="mt-3">
+                <a href="{{ url_for('grade_homework_solution', solution_id=solution.id) }}"
+                   class="btn btn-success">
+                    <i class="fas fa-star"></i> Оценить
+                </a>
+                <a href="{{ url_for('view_homework_solutions', homework_id=solution.homework_id) }}"
+                   class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Назад ко всем решениям
+                </a>
+            </div>
+            {% else %}
+            <div class="mt-3">
+                <a href="{{ url_for('group_homeworks', group_id=solution.group_id) }}"
+                   class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Назад к заданиям
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

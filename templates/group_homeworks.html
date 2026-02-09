@@ -20,17 +20,17 @@
                 <div class="flex-grow-1">
                     <div class="d-flex align-items-center">
                         {% if hw.filename.endswith('.pdf') %}
-                            <i class="fas fa-file-pdf text-danger fa-2x mr-3"></i>
+                        <i class="fas fa-file-pdf text-danger fa-2x mr-3"></i>
                         {% elif hw.filename.endswith(('.png', '.jpg', '.jpeg')) %}
-                            <i class="fas fa-file-image text-primary fa-2x mr-3"></i>
+                        <i class="fas fa-file-image text-primary fa-2x mr-3"></i>
                         {% elif hw.filename.endswith(('.doc', '.docx')) %}
-                            <i class="fas fa-file-word text-info fa-2x mr-3"></i>
+                        <i class="fas fa-file-word text-info fa-2x mr-3"></i>
                         {% elif hw.filename.endswith('.txt') %}
-                            <i class="fas fa-file-alt text-secondary fa-2x mr-3"></i>
+                        <i class="fas fa-file-alt text-secondary fa-2x mr-3"></i>
                         {% elif hw.filename.endswith(('.zip', '.rar')) %}
-                            <i class="fas fa-file-archive text-warning fa-2x mr-3"></i>
+                        <i class="fas fa-file-archive text-warning fa-2x mr-3"></i>
                         {% else %}
-                            <i class="fas fa-file fa-2x mr-3"></i>
+                        <i class="fas fa-file fa-2x mr-3"></i>
                         {% endif %}
 
                         <div>
@@ -62,6 +62,125 @@
                     {% endif %}
                 </div>
             </div>
+            <div class="mt-3 border-top pt-3">
+                {% if not current_user.teacher %}
+                {% set user_solution = namespace(exists=false) %}
+                {% for solution in hw.solutions if solution.user_id == current_user.id %}
+                {% set user_solution.exists = true %}
+                {% set user_solution.id = solution.id %}
+                {% set user_solution.is_graded = solution.is_graded %}
+                {% set user_solution.points_awarded = solution.points_awarded %}
+                {% endfor %}
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        {% if user_solution.exists %}
+                        <span class="text-success">
+                                    <i class="fas fa-check-circle"></i> Решение отправлено
+                                </span>
+                        {% if user_solution.is_graded %}
+                        <span class="badge badge-success ml-2">
+                                    <i class="fas fa-star"></i> {{ user_solution.points_awarded }} баллов
+                                </span>
+                        {% else %}
+                        <span class="badge badge-warning ml-2">Ожидает проверки</span>
+                        {% endif %}
+                        {% else %}
+                        <span class="text-muted">
+                                    <i class="fas fa-clock"></i> Решение не отправлено
+                                </span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        {% if user_solution.exists %}
+                        <a href="{{ url_for('view_homework_solution', solution_id=user_solution.id) }}"
+                           class="btn btn-sm btn-info" title="Просмотреть решение">
+                            <i class="fas fa-eye"></i> Просмотреть
+                        </a>
+                        {% else %}
+                        <a href="{{ url_for('submit_homework_solution', homework_id=hw.id) }}"
+                           class="btn btn-sm btn-success" title="Отправить решение">
+                            <i class="fas fa-paper-plane"></i> Отправить решение
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        {% if hw.solutions %}
+                        <span class="text-muted">
+                                    <i class="fas fa-users"></i> Решений: {{ hw.solutions|length }}
+                                    {% set ungraded_count = hw.solutions|selectattr('is_graded', 'equalto', false)|list|length %}
+                                    {% if ungraded_count > 0 %}
+                                    <span class="badge badge-warning ml-2">
+                                        <i class="fas fa-clock"></i> {{ ungraded_count }} ждут проверки
+                                    </span>
+                                    {% endif %}
+                                </span>
+                        {% else %}
+                        <span class="text-muted">
+                                    <i class="fas fa-info-circle"></i> Пока нет решений
+                                </span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <a href="{{ url_for('view_homework_solutions', homework_id=hw.id) }}"
+                           class="btn btn-sm btn-outline-primary" title="Просмотреть все решения">
+                            <i class="fas fa-list-check"></i> Просмотреть решения
+                        </a>
+                    </div>
+                </div>
+                {% if hw.solutions %}
+                <div class="mt-2">
+                    <small class="text-muted d-block mb-2">Последние решения:</small>
+                    <div class="list-group list-group-flush">
+                        {% for solution in hw.solutions[:3] %}
+                        <div class="list-group-item py-1 px-0 bg-transparent">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <small>
+                                        {{ solution.user.surname }} {{ solution.user.name }}
+                                        <span class="text-muted ml-2">
+                                                {{ solution.submitted_at.strftime('%d.%m.%Y %H:%M') }}
+                                            </span>
+                                    </small>
+                                </div>
+                                <div>
+                                    {% if solution.is_graded %}
+                                    <span class="badge badge-success badge-pill">
+                                            {{ solution.points_awarded }}
+                                        </span>
+                                    {% else %}
+                                    <span class="badge badge-warning badge-pill">Ожидает</span>
+                                    {% endif %}
+                                    <a href="{{ url_for('view_homework_solution', solution_id=solution.id) }}"
+                                       class="btn btn-sm btn-link p-0 ml-1">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            </br>
+                            </br>
+                        </div>
+                        {% endfor %}
+
+                        {% if hw.solutions|length > 3 %}
+                        <div class="text-center mt-1">
+                            <small class="text-muted">
+                                И еще {{ hw.solutions|length - 3 }} решений...
+                            </small>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                {% endif %}
+            </div>
+            </br>
+            </br>
+            </br>
+            </br>
         </div>
         {% endfor %}
     </div>

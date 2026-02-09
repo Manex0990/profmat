@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Отправка решения для задания</h2>
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">{{ homework.original_filename }}</h5>
+            {% if homework.description %}
+            <p class="card-text">{{ homework.description }}</p>
+            {% endif %}
+            <small class="text-muted">
+                Добавлено: {{ homework.teacher.surname }} {{ homework.teacher.name }} |
+                {{ homework.created_at.strftime('%d.%m.%Y %H:%M') }}
+            </small>
+        </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-group">
+            {{ form.description.label }}
+            {{ form.description(class="form-control", rows=3, 
+                               placeholder="Опишите ваше решение (необязательно)") }}
+        </div>
+        
+        <div class="form-group">
+            {{ form.files.label }}
+            {{ form.files(class="form-control-file", multiple="multiple") }}
+            {% if form.files.errors %}
+                {% for error in form.files.errors %}
+                    <small class="text-danger">{{ error }}</small>
+                {% endfor %}
+            {% endif %}
+            <small class="form-text text-muted">
+                Можно загрузить несколько файлов. Максимальный размер каждого файла: 16MB.
+                Допустимые форматы: PDF, PNG, JPG, DOC, PPT, TXT, ZIP, RAR
+            </small>
+        </div>
+        
+        <div id="fileList" class="mb-3"></div>
+        
+        {{ form.submit(class="btn btn-primary") }}
+        <a href="{{ url_for('group_homeworks', group_id=homework.group_id) }}" 
+           class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+{% endblock %}

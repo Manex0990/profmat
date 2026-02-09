@@ -4,19 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="add homeworks and files with solution">
-      <change afterPath="$PROJECT_DIR$/static/demo/homeworks_list_demo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/demo/solutions_history_demo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/demo/student_group_demo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/demo/task_list_demo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/demo/task_solution_demo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/demo/teacher_group_demo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/demo/upload_homeworks_demo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/landing.html" afterDir="false" />
+    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="add landing page">
+      <change afterPath="$PROJECT_DIR$/data/homework_solutions.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/form/homework_solution.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/grade_homework_solution.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/homework_solutions_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/submit_homework_solution.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/view_homework_solution.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/configs.py" beforeDir="false" afterPath="$PROJECT_DIR$/configs.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/__all_models.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/__all_models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/homeworks.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/homeworks.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db/web.db" beforeDir="false" afterPath="$PROJECT_DIR$/db/web.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/group_homeworks.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/group_homeworks.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,6 +39,7 @@
       </GitPushTagMode>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="MIXED" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -216,14 +217,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1762618722997</updated>
-    </task>
-    <task id="LOCAL-00010" summary="small fixes">
-      <option name="closed" value="true" />
-      <created>1762801397779</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1762801397779</updated>
     </task>
     <task id="LOCAL-00011" summary="little bit changed templates">
       <option name="closed" value="true" />
@@ -609,7 +602,15 @@
       <option name="project" value="LOCAL" />
       <updated>1769258136606</updated>
     </task>
-    <option name="localTasksCounter" value="59" />
+    <task id="LOCAL-00059" summary="add landing page">
+      <option name="closed" value="true" />
+      <created>1769868228649</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1769868228649</updated>
+    </task>
+    <option name="localTasksCounter" value="60" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -624,7 +625,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix bug with browser back button" />
     <MESSAGE value="add generation linear inequation" />
     <MESSAGE value="more optimization and work on linear inequation" />
     <MESSAGE value="work on answer linear inequation" />
@@ -649,6 +649,7 @@
     <MESSAGE value="delete old files" />
     <MESSAGE value="add gitignore file" />
     <MESSAGE value="add homeworks and files with solution" />
-    <option name="LAST_COMMIT_MESSAGE" value="add homeworks and files with solution" />
+    <MESSAGE value="add landing page" />
+    <option name="LAST_COMMIT_MESSAGE" value="add landing page" />
   </component>
 </project>

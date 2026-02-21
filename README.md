@@ -12,6 +12,12 @@
 
 Логин            Пароль   Роль     Группы
 
+qwe9@gmail.com   123      Учитель  10A
+
+qwe10@gmail.com   123      Ученик  10A
+
+qwe11@gmail.com   123      Ученик  10A
+
 qwe@gmail.com    123      Учитель  test_1, group
 
 qwe1@gmail.com   123      Ученик   test_1

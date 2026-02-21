@@ -30,7 +30,6 @@ login_manager.login_view = 'login'
 
 db_session.global_init("db/web.db")
 
-# Конфигурация загрузки файлов
 UPLOAD_FOLDER = 'static/uploads'
 HOMEWORK_FOLDER = os.path.join(UPLOAD_FOLDER, 'homeworks')
 SOLUTION_FOLDER = os.path.join(UPLOAD_FOLDER, 'solutions')
@@ -125,16 +124,11 @@ def validate_group_access(group_id):
     """Проверка доступа пользователя к группе"""
     db_sess = db_session.create_session()
     try:
-        group = db_sess.query(Group).filter(Group.id == group_id).first()
-        if not group:
-            flash("Группа не найдена", "error")
+        result = db_sess.query(Group, GroupMember).outerjoin(GroupMember, (GroupMember.group_id == Group.id) & (
+                    GroupMember.user_id == current_user.id)).filter(Group.id == group_id).first()
+        if not result:
             return None, None
-
-        group_member = db_sess.query(GroupMember).filter_by(user_id=current_user.id, group_id=group_id).first()
-        if not group_member:
-            flash("Вы не состоите в этой группе!", "error")
-            return None, None
-
+        group, group_member = result
         return group, group_member
     finally:
         db_sess.close()
@@ -151,7 +145,6 @@ def handle_task_request(group_id, task_key, cookie_name, show_solution=False, te
     task = str(request.cookies.get(cookie_name, config['generate_func']()))
     form = TaskForm()
 
-    # Обработка запроса на показ решения
     show_solution_param = request.args.get('show_solution') == 'true' or show_solution
 
     if request.method == 'GET':
@@ -169,7 +162,6 @@ def handle_task_request(group_id, task_key, cookie_name, show_solution=False, te
         response.set_cookie(cookie_name, value=str(task), max_age=60 * 60 * 24 * 365 * 2)
         return response
 
-    # POST запрос
     user_answer = form.answer.data
     verdict = config['check_func'](task, user_answer)
     message, is_correct, eq_type, correct_answer = verdict
@@ -258,7 +250,6 @@ def open_task_menu(group_id):
             return redirect(url_for('student_groups'))
 
         res = make_response(render_template('task_window.html', group=group))
-        # Сбрасываем значения ключей cookie
         res.set_cookie('solution', '0', max_age=60 * 60 * 24 * 365 * 2)
         res.set_cookie('cur_task_biquadratic_equation', '', max_age=0)
         res.set_cookie('cur_task_quadratic_equation', '', max_age=0)
@@ -275,7 +266,7 @@ def open_task_menu(group_id):
 @login_required
 def show_solution(group_id, task_type):
     """Показать решение задачи без проверки ответа"""
-    # Устанавливаем значение ключа solution в 1 при открытии страницы решения, так как пользователь видел решение
+    # устанавливаем значение ключа solution в 1 при открытии страницы решения, так как пользователь видел решение
     response = redirect(url_for(route_mapping[task_type], group_id=group_id, show_solution='true'))
     response.set_cookie('solution', '1', max_age=60 * 60 * 24 * 365 * 2)
     return response
@@ -301,79 +292,62 @@ def group_solutions(group_id):
             return redirect(url_for('view_groups'))
 
         form = GroupSolutionsForm()
+        page = request.args.get('page', 1, type=int)
+        per_page = 50  # количество записей на странице
 
-        if request.method == 'GET':
-            solutions = db_sess.query(Solution).filter_by(group_id=group_id).order_by(
-                Solution.submitted_at.desc()).all()
-            return render_template('group_solutions.html', group=group, solutions=solutions, form=form)
+        query = db_sess.query(Solution).filter_by(group_id=group_id)
 
-        if form.validate_on_submit():
+        if request.method == 'POST' and form.validate_on_submit():
             if form.clean.data:
                 db_sess.query(Solution).filter_by(group_id=group_id).delete()
                 db_sess.commit()
                 flash("История решений очищена", "success")
                 return redirect(url_for('group_solutions', group_id=group_id))
 
-            elif form.submit.data or form.show_all.data:
-                searching_surname = form.surname.data.strip() if form.surname.data else None
-                searching_name = form.name.data.strip() if form.name.data else None
-                searching_patronymic = form.patronymic.data.strip() if form.patronymic.data else None
-                searching_date = form.date.data
+            searching_surname = form.surname.data.strip() if form.surname.data else None
+            searching_name = form.name.data.strip() if form.name.data else None
+            searching_patronymic = form.patronymic.data.strip() if form.patronymic.data else None
+            searching_date = form.date.data
 
-                solutions_query = db_sess.query(Solution).filter_by(group_id=group_id)
+            if searching_date:
+                start_date = datetime.combine(searching_date, datetime.min.time())
+                end_date = datetime.combine(searching_date, datetime.max.time())
+                query = query.filter(
+                    Solution.submitted_at >= start_date,
+                    Solution.submitted_at <= end_date
+                )
 
-                if form.show_all.data or not any(
-                        [searching_surname, searching_name, searching_patronymic, searching_date]):
-                    solutions = solutions_query.order_by(Solution.submitted_at.desc()).all()
-                    return render_template('group_solutions.html', group=group, solutions=solutions, form=form)
+            if searching_surname or searching_name or searching_patronymic:
+                user_query = db_sess.query(User.id)
+                if searching_surname:
+                    user_query = user_query.filter(User.surname.ilike(f'%{searching_surname}%'))
+                if searching_name:
+                    user_query = user_query.filter(User.name.ilike(f'%{searching_name}%'))
+                if searching_patronymic:
+                    user_query = user_query.filter(User.patronymic.ilike(f'%{searching_patronymic}%'))
+                user_ids = [uid for (uid,) in user_query.all()]
+                query = query.filter(Solution.user_id.in_(user_ids))
 
-                # Фильтр по дате
-                if searching_date:
-                    start_date = datetime.combine(searching_date, datetime.min.time())
-                    end_date = datetime.combine(searching_date, datetime.max.time())
-                    solutions_query = solutions_query.filter(
-                        Solution.submitted_at >= start_date,
-                        Solution.submitted_at <= end_date
-                    )
-
-                # Фильтр по ФИО
-                filtered_user_ids = []
-                if searching_surname or searching_name or searching_patronymic:
-                    group_students = db_sess.query(User).join(GroupMember).filter(
-                        GroupMember.group_id == group_id,
-                        GroupMember.is_teacher == False
-                    ).all()
-
-                    for student in group_students:
-                        match = True
-
-                        if searching_surname:
-                            if not student.surname or searching_surname.lower() != student.surname.lower():
-                                match = False
-
-                        if searching_name:
-                            if not student.name or searching_name.lower() != student.name.lower():
-                                match = False
-
-                        if searching_patronymic:
-                            if not student.patronymic or searching_patronymic.lower() != student.patronymic.lower():
-                                match = False
-
-                        if match:
-                            filtered_user_ids.append(student.id)
-
-                if filtered_user_ids:
-                    solutions_query = solutions_query.filter(Solution.user_id.in_(filtered_user_ids))
-                elif searching_surname or searching_name or searching_patronymic:
-                    solutions = []
-                    return render_template('group_solutions.html', group=group, solutions=solutions, form=form)
-
-                solutions = solutions_query.order_by(Solution.submitted_at.desc()).all()
-
+            if form.show_all.data:
+                solutions = query.options(joinedload(Solution.user)).order_by(Solution.submitted_at.desc()).all()
                 return render_template('group_solutions.html', group=group, solutions=solutions, form=form)
 
-        solutions = db_sess.query(Solution).filter_by(group_id=group_id).order_by(Solution.submitted_at.desc()).all()
-        return render_template('group_solutions.html', group=group, solutions=solutions, form=form)
+        total = query.count()
+        solutions = query.options(joinedload(Solution.user))\
+            .order_by(Solution.submitted_at.desc())\
+            .offset((page - 1) * per_page)\
+            .limit(per_page)\
+            .all()
+
+        return render_template(
+            'group_solutions.html',
+            group=group,
+            solutions=solutions,
+            form=form,
+            page=page,
+            total_pages=(total + per_page - 1) // per_page,
+            total=total
+        )
 
     except Exception as e:
         flash(f"Произошла ошибка: {e}", "error")
@@ -598,7 +572,6 @@ def submit_homework_solution(homework_id):
         form = HomeworkSolutionForm()
 
         if form.validate_on_submit():
-            # Создаем запись решения
             solution = HomeworkSolution(
                 homework_id=homework_id,
                 user_id=current_user.id,
@@ -725,15 +698,12 @@ def grade_homework_solution(solution_id):
         form = GradeHomeworkForm()
 
         if form.validate_on_submit():
-            # Получаем старые баллы
             old_points = solution.points_awarded
 
-            # Обновляем решение
             solution.points_awarded = form.points.data
             solution.teacher_comment = form.comment.data
             solution.is_graded = True
 
-            # Обновляем общий рейтинг ученика
             if request.form.get('update_points'):
                 member = db_sess.query(GroupMember).filter_by(
                     group_id=solution.group_id,
@@ -741,7 +711,6 @@ def grade_homework_solution(solution_id):
                 ).first()
 
                 if member:
-                    # Вычитаем старые баллы и добавляем новые
                     member.points = member.points - old_points + form.points.data
 
             db_sess.commit()

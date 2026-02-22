@@ -41,7 +41,7 @@
         <td>
             {% if not member.is_teacher %}
             <form method="post" action="{{ url_for('add_points', group_id=group.id, user_id=member.user.id) }}">
-                <input type="number" name="points" value="1" min="1">
+                <input type="number" name="points" value="0">
                 <button type="submit" class="btn btn-primary">+</button>
             </form>
             {% endif %}

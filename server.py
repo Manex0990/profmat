@@ -495,6 +495,19 @@ def delete_homework(homework_id):
             pass
 
         group_id = homework.group_id
+        files_to_delete = (
+            db_sess.query(HomeworkSolutionFile)
+            .join(HomeworkSolution)
+            .filter(HomeworkSolution.homework_id == homework_id)
+            .all()
+        )
+
+        for file_record in files_to_delete:
+            try:
+                if os.path.exists(file_record.filepath):
+                    os.remove(file_record.filepath)
+            except Exception as e:
+                flash('Не удалось удалить файлы домашних заданий')
         db_sess.delete(homework)
         db_sess.commit()
 

@@ -4,11 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="add negative grade">
+    <list default="true" id="c250aaea-94b3-4417-94c6-888cd9e3bbf6" name="Changes" comment="add cascade deleting">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db/web.db" beforeDir="false" afterPath="$PROJECT_DIR$/db/web.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/uploads/homeworks/20260131_152716_14_7_.docx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/uploads/homework_solutions/20260209_222020_5_26.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/uploads/homework_solutions/20260209_222403_3_demo_2025_17.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/uploads/homework_solutions/20260222_183332_16_26_2.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/uploads/solutions/20260124_153241_5_docx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/uploads/solutions/20260209_223139_5_IDinf10-11_1.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/uploads/solutions/20260209_223256_3_IDinf10-11_1.zip" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -209,14 +214,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1762618722997</updated>
-    </task>
-    <task id="LOCAL-00017" summary="end old project and start to adding news">
-      <option name="closed" value="true" />
-      <created>1763245118328</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1763245118328</updated>
     </task>
     <task id="LOCAL-00018" summary="add biquadratic equations">
       <option name="closed" value="true" />
@@ -602,7 +599,15 @@
       <option name="project" value="LOCAL" />
       <updated>1771774062918</updated>
     </task>
-    <option name="localTasksCounter" value="66" />
+    <task id="LOCAL-00066" summary="add cascade deleting">
+      <option name="closed" value="true" />
+      <created>1771776312105</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1771776312105</updated>
+    </task>
+    <option name="localTasksCounter" value="67" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -617,7 +622,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="new secret key" />
     <MESSAGE value="add temp get solution linear inequation function" />
     <MESSAGE value="add probably working linear inequations" />
     <MESSAGE value="little optimization" />
@@ -642,6 +646,7 @@
     <MESSAGE value="that all" />
     <MESSAGE value="optimization" />
     <MESSAGE value="add negative grade" />
-    <option name="LAST_COMMIT_MESSAGE" value="add negative grade" />
+    <MESSAGE value="add cascade deleting" />
+    <option name="LAST_COMMIT_MESSAGE" value="add cascade deleting" />
   </component>
 </project>

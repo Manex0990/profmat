@@ -299,6 +299,11 @@ def group_solutions(group_id):
 
         if request.method == 'POST' and form.validate_on_submit():
             if form.clean.data:
+                files_to_delete = db_sess.query(SolutionFile).join(Solution).filter(Solution.group_id == group_id).all()
+                for file in files_to_delete:
+                    if os.path.exists(file.filepath):
+                        os.remove(file.filepath)
+                    db_sess.delete(file)
                 db_sess.query(Solution).filter_by(group_id=group_id).delete()
                 db_sess.commit()
                 flash("История решений очищена", "success")

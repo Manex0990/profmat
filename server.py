@@ -38,7 +38,7 @@ os.makedirs(HOMEWORK_SOLUTION_FOLDER, exist_ok=True)
 ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'doc', 'docx', 'txt', 'zip', 'rar'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 32 * 1024 * 1024  # 32 MB
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 32 MB
 
 os.makedirs(HOMEWORK_FOLDER, exist_ok=True)
 os.makedirs(SOLUTION_FOLDER, exist_ok=True)

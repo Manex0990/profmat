@@ -154,17 +154,14 @@ class MyMath:
 
     def normalize_linear_equation_format(self, equation: str) -> str:
         """Нормализует линейное уравнение: преобразует b - ax = c в -ax + b = c для парсинга"""
-        # Убираем пробелы
         eq = equation.replace(' ', '')
 
-        # Разделяем на левую и правую части
         if '=' not in eq:
             return equation
 
         left_part, right_part = eq.split('=')
 
         # Проверяем формат b - ax
-        # Паттерн для формата: число, потом минус, потом коэффициент и x
         pattern = r'^([+-]?\d+)-(\d*)x(.*)'
         match = re.match(pattern, left_part)
 
@@ -182,14 +179,12 @@ class MyMath:
             else:
                 normalized_left = f"-{a}x"
 
-            # Добавляем b
             if b != 0:
                 if b > 0:
                     normalized_left += f" + {b}"
                 else:
-                    normalized_left += f" {b}"  # b уже отрицательное
+                    normalized_left += f" {b}"
 
-            # Добавляем остаток если есть
             normalized_left += rest
 
             return f"{normalized_left} = {right_part}"
@@ -202,7 +197,6 @@ class MyMath:
         if eq_type == 'linear':
             equation = self.normalize_linear_equation_format(equation)
 
-        # Убираем пробелы
         clean_eq = equation.replace(' ', '')
         coefficients = {'a': 0, 'b': 0, 'c': 0, 'd': 0}
 
@@ -221,7 +215,7 @@ class MyMath:
             return [coefficients['a'], coefficients['b'], coefficients['c']]
         elif eq_type in ['quadratic', 'biquadratic']:
             return [coefficients['a'], coefficients['b'], coefficients['c']]
-        else:  # irrational
+        else:
             return [coefficients['a'], coefficients['b'], coefficients['c'], coefficients['d']]
 
     def find_coofs_linear_equation(self, equation: str) -> List[int]:
@@ -291,7 +285,6 @@ class MyMath:
         y_roots = self.solve_quadratic_equation(a, b, c)
         if not y_roots:
             return "Корней нет"
-        # Извлекаем корни из неотрицательных значений y
         final_roots = []
         for y in y_roots:
             if y > 0:
@@ -440,7 +433,6 @@ class MyMath:
                 else:
                     result += f' ∪ {{{'; '.join(single_zeros)}}}'
 
-        # Возвращаем ответ
         if not len(result):
             return 'Корней нет'
         return result
@@ -515,7 +507,6 @@ class MyMath:
 
         result = self.OPERATIONS[task_type](numbers)
 
-        # Форматирование результата
         if stage == 1 and task_type in ['s', 'm', 'mul']:
             result = int(round(result, 2))
         else:
@@ -540,7 +531,6 @@ class MyMath:
         """Проверяет ответ для любого примера"""
         correct_answer = self.answer_for_all_stages(task)
 
-        # Нормализация ответов
         user_ans = str(user_answer).strip().rstrip('.0')
         correct_ans = correct_answer.rstrip('.0')
 

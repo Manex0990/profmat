@@ -8,7 +8,6 @@ secret_key = 'profmat_pet_project_2026_key'
 def calculate_and_round_roots(root_str):
     """Вычисляет числовое значение корня и округляет до сотых"""
     try:
-        # Если корень в формате √number
         if '√' in root_str:
             number_str = root_str.replace('√', '').replace('-', '')
             number = float(number_str)
@@ -16,7 +15,6 @@ def calculate_and_round_roots(root_str):
             if root_str.startswith('-'):
                 result = -result
             return round(result, 2)
-        # Если это просто число
         else:
             return round(float(root_str), 2)
     except:
@@ -38,7 +36,6 @@ def get_linear_inequality_solution(task):
     """
     steps = []
 
-    # Шаг 1: Анализ вида неравенства
     steps.append('1. Анализ вида неравенства:')
     inequality_symbol = task.split()[-2]
     expression = task.replace(' > 0', '').replace(' < 0', '').replace(' ≥ 0', '').replace(' ≤ 0', '')
@@ -53,7 +50,6 @@ def get_linear_inequality_solution(task):
 
     sign_change_map = {'>': '<', '<': '>', '≥': '≤', '≤': '≥'}
 
-    # Шаг 2: Преобразования скобок
     steps.append("\n2. Преобразуем скобки:")
     steps.append(
         'Нужно привести все скобки к виду, где x со своим коэффициентом будет стоять вначале, а свободный коэффициент - в конце.')
@@ -90,7 +86,6 @@ def get_linear_inequality_solution(task):
 
     steps.append(f'Итоговое неравенство: {temp}')
 
-    # Шаг 3: Находим нули
     steps.append('\n3. Находим нули каждого множителя:')
 
     new_brackets = new_expression[1:-1].split(')(')
@@ -104,7 +99,6 @@ def get_linear_inequality_solution(task):
     roots = sorted(list(roots), key=lambda x: float(x))
     steps.append(f'   В порядке возрастания: {', '.join(roots)}')
 
-    # Шаг 4: Метод интервалов
     steps.append('\n4. Применяем метод интервалов:')
     steps.append('   - Расставляем нули на числовой прямой')
     steps.append('   - Определяем знак выражения на каждом интервале')
@@ -137,7 +131,6 @@ def get_linear_inequality_solution(task):
 
     steps.append('   - Выбираем интервалы, удовлетворяющие неравенству')
 
-    # Шаг 5: Получаем готовый ответ
     steps.append('\n5. Получаем решение:')
     final_answer = ex.answer_linear_inequation(task)
     steps.append(f'   {final_answer}')
@@ -152,12 +145,10 @@ def get_biquadratic_solution(task):
     """
     steps = []
 
-    # Шаг 1: Замена переменной
     steps.append('1. Сделаем замену переменной: y = x²')
     equation_y = task.replace('x⁴', 'y²').replace('x²', 'y')
     steps.append(f'   Получим: {equation_y}')
 
-    # Находим коэффициенты квадратного уравнения
     try:
         a, b, c = ex.find_coofs_quadratic_equation(task.replace('x²', 'x').replace('x⁴', 'x²'))
         D = ex.find_discriminant_biquadratic(task)
@@ -166,11 +157,9 @@ def get_biquadratic_solution(task):
         steps.append(f'   a = {a}, b = {b}, c = {c}')
         steps.append(f'   Дискриминант D = b² - 4ac = {b}² - 4·{a}·{c} = {D}')
 
-        # Анализ дискриминанта
         if D > 0:
             steps.append('   D > 0 ⇒ уравнение имеет два действительных корня')
 
-            # Находим корни для y
             y_roots = ex.answer_quadratic_equation(task.replace('x²', 'x').replace('x⁴', 'x²'))
             if isinstance(y_roots, str):
                 y_roots = y_roots.split()
@@ -183,11 +172,9 @@ def get_biquadratic_solution(task):
 
             steps.append('4. Сделаем обратную подстановку x² = y:')
 
-            # Анализ корней для y и вычисление конечных корней
             real_roots_numeric = []  # Для численных значений
             real_roots_symbolic = []  # Для символьного представления
 
-            # Обработка y1
             try:
                 y1_val = float(y1)
                 if y1_val > 0:
@@ -216,7 +203,6 @@ def get_biquadratic_solution(task):
                         steps.append(f'   x² = {y1} ⇒ x = ±{y1}')
                     real_roots_symbolic.extend([y1, f'-{y1}'])
 
-            # Обработка y2
             try:
                 y2_val = float(y2)
                 if y2_val > 0:
@@ -237,7 +223,6 @@ def get_biquadratic_solution(task):
                 if y2.startswith('-'):
                     steps.append(f'   x² = {y2} < 0 ⇒ действительных корней нет')
                 else:
-                    # Пытаемся вычислить численное значение
                     numeric_val = calculate_and_round_roots(y2)
                     if isinstance(numeric_val, (int, float)):
                         root1 = abs(numeric_val) ** 0.5
@@ -247,10 +232,8 @@ def get_biquadratic_solution(task):
                         steps.append(f'   x² = {y2} ⇒ x = ±{y2}')
                     real_roots_symbolic.extend([y2, f'-{y2}'])
 
-            # Убираем дубликаты и сортируем численные корни
             real_roots_numeric = sorted(list(set(real_roots_numeric)))
 
-            # Формируем окончательный ответ
             if real_roots_numeric:
                 steps.append('5. Действительные корни исходного уравнения:')
                 numeric_str = '; '.join([f'{x:.2f}' if x != 0 else '0' for x in real_roots_numeric])
@@ -263,7 +246,6 @@ def get_biquadratic_solution(task):
         elif D == 0:
             steps.append('   D = 0 ⇒ уравнение имеет один корень (кратности 2)')
 
-            # Находим корень для y
             y_root = ex.answer_quadratic_equation(task.replace('x²', 'x').replace('x⁴', 'x²'))
             if isinstance(y_root, str) and ' ' in y_root:
                 y_root = y_root.split()[0]
@@ -271,7 +253,6 @@ def get_biquadratic_solution(task):
             steps.append(f'3. Найдем корень для y: y = -b/(2a) = {y_root}')
             steps.append('4. Сделаем обратную подстановку x² = y:')
 
-            # Анализ корня для y и вычисление конечных корней
             real_roots_numeric = []
 
             try:
@@ -305,11 +286,9 @@ def get_biquadratic_solution(task):
                         steps.append(f'   x² = {y_root} ⇒ x = ±{y_root}')
                     real_roots_symbolic = [y_root, f'-{y_root}']
 
-            # Сортируем корни
             real_roots_numeric.sort()
             real_roots_symbolic.sort(key=lambda x: x.startswith('-'))
 
-            # Формируем окончательный ответ
             if real_roots_numeric:
                 steps.append('5. Действительные корни исходного уравнения:')
                 numeric_str = '; '.join([f'{x:.2f}' if x != 0 else '0' for x in real_roots_numeric])
@@ -319,7 +298,7 @@ def get_biquadratic_solution(task):
                 steps.append('5. Уравнение не имеет действительных корней')
                 final_answer = 'корней нет'
 
-        else:  # D < 0
+        else:
             steps.append('   D < 0 ⇒ квадратное уравнение не имеет действительных корней')
             steps.append('3. Следовательно, исходное биквадратное уравнение также')
             steps.append('   не имеет действительных корней')
@@ -340,12 +319,10 @@ def get_irrational_solution(task):
     """
     steps = []
 
-    # Шаг 1: Находим коэффициенты уравнения
     steps.append('1. Находим коэффициенты уравнения:')
     a, b, c, d = ex.find_coofs_irrational_equation(task)
     steps.append(f'   Коэффициенты: a = {a}, b = {b}, c = {c}, d = {d}')
 
-    # Шаг 2: Анализ уравнения и условия существования
     left_part = task.split(' = ')[1]  # получаем выражение из левой части уравнения
     definition = -d / c
     definition = int(definition) if definition.is_integer() else round(definition, 2) if len(
@@ -360,7 +337,6 @@ def get_irrational_solution(task):
     else:
         steps.append(f'  Получим неравенство x ≤ {definition}')
 
-    # Шаг 3: Возведение в квадрат
     right_part = task.split(' = ')[0]  # получаем выражение из правой части уравнения
     under_root = right_part.replace('√', '').replace('(', '').replace(')', '')
     steps.append('3. Возведем обе части уравнения в квадрат:')
@@ -369,18 +345,15 @@ def get_irrational_solution(task):
     steps.append('    Неотрицательность подкоренного выражения можно не проверять,')
     steps.append('    так как оно равно квадрату некоторого выражения, а квадрат всегда ≥ 0')
 
-    # Шаг 4: Раскрытие квадрата в правой части
     a_temp, b_temp, c_temp = c ** 2, 2 * c * d, d ** 2
     steps.append('4. Раскроем квадрат в правой части:')
     right_expanded = f'{ex.generate_equation('quadratic', [a_temp, b_temp, c_temp]).replace(' = 0', '')}'
     steps.append(f'   {under_root} = {right_expanded}')
 
-    # Шаг 5: Перенос всех членов в одну сторону
     steps.append('5. Перенесем все члены в левую часть:')
     equation = f'{under_root} - ({right_expanded}) = 0'
     steps.append(f'   {equation}')
 
-    # Упрощаем
     A = -c ** 2
     B = a - 2 * c * d
     C = b - d ** 2
@@ -388,11 +361,9 @@ def get_irrational_solution(task):
     simplified = f'{ex.generate_equation('quadratic', [A, B, C])}'
     steps.append(f'   Упростим и получим: {simplified}')
 
-    # Шаг 6: Используем существующую функцию для получения корней
     steps.append('6. Решаем полученное уравнение:')
     roots_result = ex.answer_quadratic_equation(simplified)
 
-    # Анализируем результат
     if roots_result == 'Корней нет':
         steps.append('   Уравнение не имеет действительных корней')
         final_answer = 'Корней нет'
@@ -400,7 +371,6 @@ def get_irrational_solution(task):
     else:
         steps.append(f'   Найдены корни: {roots_result}')
 
-        # Шаг 7: Проверка условия неотрицательности правой части уравнения
         steps.append('7. Проверяем условие неотрицательности правой части уравнения для найденных корней:')
         if c > 0:
             steps.append(f'   x ≥ {definition}')
@@ -424,7 +394,6 @@ def get_irrational_solution(task):
                 else:
                     steps.append(
                         f'   Корень x = {root} > {definition} ⇒ не удовлетворяет условию неотрицательности правой части уравнения')
-        # Шаг 8: Формирование окончательного ответа
         steps.append('8. Окончательный результат:')
         if ex.answer_irrational_equation(task) != '0':
             final_answer = ex.answer_irrational_equation(task).rstrip('.0')
@@ -462,7 +431,6 @@ def get_module_solution(task):
         steps.append('1. Заметим, что коэффициенты при x совпадают, значит нужно сравнить свободные члены')
         return '2. Ответ: Корней нет'
 
-    # Возводим в квадрат
     left_part, right_part = task.split(' = ')
     steps.append('1. Мы можем возвести обе части уравнения в квадрат при условии, что они не отрицательны.')
     steps.append('2. Левая часть неотрицательна всегда, т.к. модуль не может быть отрицательным.')
@@ -473,12 +441,10 @@ def get_module_solution(task):
         steps.append(f'  3. Получим неравенство x ≤ {definition}')
     steps.append(f"\n4. Возводим в квадрат: ({left_part})² = ({right_part})²")
 
-    # Раскрываем квадраты
     left = ex.generate_equation('quadratic', [a ** 2, 2 * a * b, b ** 2]).replace(' = 0', '')
     right = ex.generate_equation('quadratic', [c ** 2, 2 * c * d, d ** 2]).replace(' = 0', '')
     steps.append(f"Получаем {left} = {right}")
 
-    # Переносим всё влево
     A = a * a - c * c
     B = 2 * a * b - 2 * c * d
     C = b * b - d * d
@@ -488,11 +454,9 @@ def get_module_solution(task):
     steps.append(new)
     steps.append(f'D = {ex.find_discriminant(new)}')
 
-    # Решаем квадратное уравнение
     solutions = ex.answer_quadratic_equation(new)
     steps.append(f'6. Получаем корни: {solutions}')
 
-    # Проверяем корни
     steps.append("\n7. Проверяем корни по ограничению:")
     valid_solutions = ex.check_routs_on_definition(solutions, definition, c)
 
@@ -512,7 +476,6 @@ def get_module_solution(task):
                 steps.append(
                     f'   Корень x = {root} > {definition} ⇒ не удовлетворяет условию неотрицательности правой части уравнения')
 
-    # Формируем ответ
     steps.append("\n8. Итоговый ответ:")
     if not len(valid_solutions):
         steps.append("Уравнение не имеет решений")

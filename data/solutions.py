@@ -15,7 +15,6 @@ class Solution(SqlAlchemyBase):
     points_awarded = sqlalchemy.Column(sqlalchemy.Integer, default=0)   # сколько баллов начислено
     submitted_at = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.now)
 
-    # Связь с пользователем и группой
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'))
     group_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('groups.id'))
 
